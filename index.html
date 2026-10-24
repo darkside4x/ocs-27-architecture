@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>OCS 2026–27 · Current repository architecture</title>
+    <style>
+      :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #172334; background: #f4f7fb; }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      header { background: #142641; color: white; padding: 3.3rem max(1.4rem, calc((100vw - 1120px) / 2)); }
+      header p { color: #cbd7e7; max-width: 70ch; line-height: 1.55; }
+      h1 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -.04em; margin: .2rem 0 .8rem; }
+      h2 { font-size: 1.55rem; letter-spacing: -.025em; margin: 0 0 .75rem; }
+      h3 { margin: 0 0 .35rem; }
+      main { max-width: 1120px; margin: 0 auto; padding: 1.5rem 1.4rem 4rem; }
+      section { background: white; border: 1px solid #dce5ef; border-radius: 16px; box-shadow: 0 8px 30px #1723340a; padding: clamp(1.2rem, 3vw, 2rem); margin: 1.3rem 0; }
+      p, li { line-height: 1.6; }
+      .eyebrow { text-transform: uppercase; font-size: .78rem; font-weight: 800; letter-spacing: .13em; color: #a9c7f7; }
+      .status { display: inline-block; background: #fdf0d2; color: #6c4300; border: 1px solid #e9c97a; border-radius: 999px; padding: .32rem .75rem; font-weight: 700; font-size: .88rem; }
+      .lead { font-size: 1.14rem; margin-top: .8rem; }
+      .diagram { background: #f9fbfe; border: 1px solid #e0e8f1; border-radius: 12px; padding: 1.2rem; overflow-x: auto; }
+      .mermaid { min-width: 680px; text-align: center; }
+      .caption { color: #526276; font-size: .94rem; margin-bottom: 0; }
+      .key { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0 0; }
+      .key span { padding: .4rem .7rem; background: #edf4fc; border-radius: 8px; font-size: .9rem; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+      .card { border: 1px solid #e0e8f1; background: #fafcff; border-radius: 12px; padding: 1rem; }
+      .card p { margin: .35rem 0 0; }
+      .tag { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 800; color: #536983; }
+      .table-wrap { overflow-x: auto; }
+      table { border-collapse: collapse; width: 100%; min-width: 650px; }
+      th, td { padding: .75rem; border-bottom: 1px solid #e0e8f1; text-align: left; vertical-align: top; line-height: 1.5; }
+      th { background: #f1f6fc; }
+      code { background: #eef3f8; padding: .1rem .3rem; border-radius: 4px; }
+      a { color: #175ab7; }
+      .callout { border-left: 4px solid #db9e25; background: #fff8e8; padding: .8rem 1rem; border-radius: 0 8px 8px 0; }
+      footer { color: #526276; font-size: .9rem; margin-top: 1.5rem; }
+      @media (max-width: 690px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">ACM VIT · OCS 2026–27</div>
+      <h1>Current repository architecture</h1>
+      <p>Source: the private <a style="color:#a9d0ff" href="https://github.com/darkside4x/OCS-27/tree/b7c491ad2a11623525442b3530cdd67c707de7fc">darkside4x/OCS-27 fork at commit b7c491a</a>, inspected on 24 October 2026. The shared development deployment details below were supplied by the team on 25 October 2026; they are separate from code that is currently implemented in the repository.</p>
+    </header>
+    <main>
+      <section>
+        <span class="status">Scaffold stage</span>
+        <p class="lead">The repository defines four places to build the recruitment platform. Today, both websites show only “Hello world!”. The backend and video service contain dependency lists but no application code. Candidate records, rounds, interviews, tasks, scoring, and decisions are not implemented.</p>
+      </section>
+
+      <section>
+        <h2>1. What someone can reach today</h2>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart LR
+  C["Candidate"] -->|"Opens /"| P["Candidate portal: Hello world!"]
+  R["Recruitment team"] -->|"Opens /"| D["Recruiter dashboard: Hello world!"]
+  classDef person fill:#e8f1ff,stroke:#3875bd,color:#152b45,stroke-width:2px
+  classDef page fill:#eaf8ef,stroke:#397e56,color:#173b25,stroke-width:2px
+  class C,R person
+  class P,D page
+          </pre>
+        </div>
+        <p class="caption">These are separate Next.js apps. Each has a root page, layout, and Tailwind CSS import. No candidate or recruiter actions are wired into those pages.</p>
+      </section>
+
+      <section>
+        <h2>2. How the repository is arranged</h2>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart TB
+  W["OCS-27: pnpm workspace"]
+  W --> P["portal/: candidate website"]
+  W --> D["dash/: recruitment website"]
+  W --> B["backend/: Convex package"]
+  W --> S["sfu/: video package"]
+  classDef root fill:#dfeafb,stroke:#476d9c,color:#152b45,stroke-width:2px
+  classDef app fill:#eaf8ef,stroke:#397e56,color:#173b25,stroke-width:2px
+  classDef reserved fill:#fff3db,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
+  class W root
+  class P,D app
+  class B,S reserved
+          </pre>
+        </div>
+        <div class="key"><span>Green = web app with a placeholder page</span><span>Amber = package with dependencies only</span><span>Lines = workspace grouping, not runtime connections</span></div>
+      </section>
+
+      <section>
+        <h2>3. Shared development backend: configured target</h2>
+        <p>The team has provided a shared Convex development service for the apps and backend work. The three <code>.env.local</code> files are local configuration and must stay out of Git. The diagram separates that deployment setup from application code that has not been wired yet.</p>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart LR
+  C["Candidate"] --> P["portal/<br/>Next.js candidate app"]
+  T["Recruitment team"] --> D["dash/<br/>Next.js recruiter app"]
+  P -. "portal/.env.local sets the URL;<br/>Convex client code is not present" .-> API["Shared Convex dev service<br/>remote deployment"]
+  D -. "dash/.env.local sets the URL;<br/>Convex client code is not present" .-> API
+  B["backend/<br/>Convex package"] -. "Run from this folder" .-> CLI["Convex CLI<br/>pnpm exec convex dev"]
+  CLI -- "backend/.env.local has URL + admin key;<br/>syncs backend code when run" --> API
+  CLI -. "Command has not been run here" .-> NOTE["No schema or functions<br/>exist in this source snapshot"]
+  DOCKER["Optional local dashboard UI<br/>Docker container on port 6791"] -. "Dashboard points at the same<br/>shared deployment" .-> API
+  classDef person fill:#e8f1ff,stroke:#3875bd,color:#152b45,stroke-width:2px
+  classDef app fill:#eaf8ef,stroke:#397e56,color:#173b25,stroke-width:2px
+  classDef service fill:#e9e8ff,stroke:#6558b5,color:#29204f,stroke-width:2px
+  classDef optional fill:#fff3db,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
+  class C,T person
+  class P,D app
+  class B,CLI,API,NOTE service
+  class DOCKER optional
+          </pre>
+        </div>
+        <div class="key"><span>Solid line = configured command targets the shared service</span><span>Dotted line = configured or optional connection, not proven app integration</span><span>Amber = optional local dashboard UI</span></div>
+        <p class="callout"><strong>Docker answer:</strong> You do not need Docker to develop the portal or dashboard, or to run the Convex CLI against the already-running shared dev service. Docker Desktop is only needed for the optional local dashboard container shown above. The shared Convex host itself is already remote, and the Docker command is not available on this machine’s PATH. See the <a href="https://docs.convex.dev/cli/overview">Convex CLI guide</a> and <a href="https://github.com/get-convex/convex-backend/blob/main/self-hosted/advanced/hosting_on_own_infra.md">self-hosted deployment guide</a>.</p>
+        <p class="caption">The portal and dashboard currently have no Convex dependency or client setup in source. The backend package currently has no schema or functions. Running <code>pnpm exec convex dev</code> is a shared-backend write operation once there is backend code, so coordinate before running it.</p>
+      </section>
+
+      <section>
+        <h2>What each package actually contains</h2>
+        <div class="grid">
+          <div class="card"><div class="tag">Candidate website</div><h3><code>portal/</code></h3><p>Next.js App Router, React, Tailwind. Its only route is <code>/</code>, displaying “Hello world!”. <code>mediasoup-client</code> and <code>socket.io-client</code> are listed but never imported.</p></div>
+          <div class="card"><div class="tag">Recruitment website</div><h3><code>dash/</code></h3><p>Separate Next.js App Router app. Its only route is also <code>/</code>, with the same placeholder. It has no candidate list, interviewer UI, or connection to the backend.</p></div>
+          <div class="card"><div class="tag">Data / application logic slot</div><h3><code>backend/</code></h3><p>Only a package manifest with <code>convex</code>. There is no Convex schema, query, mutation, authentication, or API implementation.</p></div>
+          <div class="card"><div class="tag">Interview media slot</div><h3><code>sfu/</code></h3><p>Only a package manifest with <code>mediasoup</code> and <code>socket.io</code>. There is no running SFU, signaling server, room, or meeting logic. “SFU” means a server that forwards participants’ audio/video streams.</p></div>
+        </div>
+        <p class="caption">Package names and dependencies suggest intended roles. They do not establish a working integration.</p>
+      </section>
+
+      <section>
+        <h2>Your recruitment process versus the current code</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Recruitment step</th><th>Current implementation</th></tr></thead>
+          <tbody>
+            <tr><td>Apply and create a candidate profile</td><td>No form, account system, candidate model, or persistence.</td></tr>
+            <tr><td>Assign interviewers and schedule rounds</td><td>No roles, assignments, calendar, availability, or scheduling data.</td></tr>
+            <tr><td>Conduct oral, technical, Meet, or group discussion rounds</td><td>No round types or interview UI. Video libraries are declared, but there is no session/signaling/media code.</td></tr>
+            <tr><td>Assign and collect tasks</td><td>No task definition, assignment, submission, or review flow.</td></tr>
+            <tr><td>Score, discuss, and decide</td><td>No rubrics, feedback, status transitions, or decision workflow.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section>
+        <h2>Technical foundations and boundaries</h2>
+        <ul>
+          <li><strong>Workspace:</strong> pnpm with four packages and a central dependency catalog. The root declares Node <code>^24.11.0</code> and pnpm <code>12.15.0</code>.</li>
+          <li><strong>Web apps:</strong> separate Next.js 16 canary / React 19 canary applications. Their configs enable React Compiler, component caching, partial prefetching, and Tailwind through Turbopack.</li>
+          <li><strong>Tooling:</strong> root Vite+ formatting/lint configuration; package scripts only for developing, building, and starting the two web apps.</li>
+          <li><strong>Missing system contracts:</strong> no shared types, database schema, API routes, environment examples, deployment definition, CI, or tests in this snapshot.</li>
+        </ul>
+        <p class="callout"><strong>Architecture conclusion:</strong> this is a four-package monorepo skeleton connected to a team-provided shared development service, but the repository has not implemented its data flow. Candidate → round → task/interview → evaluation → decision remains unbuilt, and the portal, dashboard, and backend have no working Convex integration in this snapshot.</p>
+      </section>
+
+      <section>
+        <h2>Evidence in the repository</h2>
+        <ul>
+          <li><a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/pnpm-workspace.yaml">Workspace packages and dependency catalog</a></li>
+          <li><a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/portal/app/page.tsx">Candidate portal page</a> and <a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/dash/app/page.tsx">dashboard page</a></li>
+          <li><a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/backend/package.json">Backend manifest</a> and <a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/sfu/package.json">SFU manifest</a></li>
+          <li><a href="https://github.com/darkside4x/OCS-27/blob/b7c491ad2a11623525442b3530cdd67c707de7fc/package.json">Root engine and package manager requirements</a></li>
+        </ul>
+        <footer>Review method: read all application, config, and documentation files; inspected the lockfile’s workspace sections and commit history. Confirmed the current fork main points to commit b7c491a. The deployment settings are team-supplied and were not tested against the live shared database. No application runtime, dependency installation, Docker, or shared-backend command was run. The private source links require repository access. Mermaid diagrams load from a CDN when this HTML file is opened.</footer>
+      </section>
+    </main>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: "base", flowchart: { htmlLabels: true, curve: "basis" } });
+    </script>
+  </body>
+</html>
