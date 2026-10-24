@@ -113,6 +113,8 @@ flowchart TB
               <tr><td>Node.js <code>22.22.0</code>; pnpm <code>11.18.0</code></td><td>Root requires Node <code>^24.11.0</code> and pins pnpm <code>12.15.0</code></td><td>For this checkout, the checked-in root manifest and workspace lockfile define the install contract.</td></tr>
               <tr><td><code>pnpm dev</code> starts both apps</td><td>No root scripts are defined</td><td>Run a package’s own script from <code>portal/</code> or <code>dash/</code>; a root orchestration command is not configured here.</td></tr>
               <tr><td>Cloudflare Workers and EC2/EBS production topology</td><td>No tracked deployment or infrastructure configuration</td><td>This is the target in the spec, not evidence that the current repo deploys there.</td></tr>
+              <tr><td>Local app ports <code>2700</code> and <code>2701</code></td><td>Both app scripts run <code>next dev</code> without a port flag</td><td>The spec’s port convention is not configured in the current package scripts.</td></tr>
+              <tr><td><code>staging</code> integration branch and <code>main</code> production branch</td><td>Remote currently exposes only <code>main</code></td><td>The described branch and deployment workflow is not present in GitHub or in tracked CI configuration.</td></tr>
             </tbody>
           </table>
         </div>
@@ -197,6 +199,24 @@ flowchart TB
           </pre>
         </div>
         <p class="caption">Dotted arrows are requested integrations from the spec, not current connections. OCS stores only the Conclave IDs and authorization metadata it needs; it does not own Conclave’s media session. Coding credentials and hidden tests stay server-side. AI responses must cite transcript segments and remain advisory.</p>
+        <h3>Logical Convex data groups in the spec</h3>
+        <p>The specification lists these as the logical source of truth. They are target data groups; no Convex schema is committed in <code>backend/</code> today.</p>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart TB
+  STATE["Convex state<br/>specified target only"]
+  STATE --> IDENTITY["Identity and rounds<br/>users · rounds · roundUsers · AOIs"]
+  STATE --> FORMS["Forms<br/>questions · validationRules<br/>formSubmissions · responses"]
+  STATE --> SCHEDULING["Interviews<br/>interviews · slots · bookings"]
+  STATE --> TASKS["Tasks<br/>tasks · taskSubmissions"]
+  STATE --> REVIEWS["Operations<br/>comments · notifications"]
+  STATE --> CODING["Coding<br/>codingContests · codingSubmissions"]
+  STATE --> TRANSCRIPTS["Interview context<br/>transcripts · transcriptSegments"]
+  classDef target fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
+  class STATE,IDENTITY,FORMS,SCHEDULING,TASKS,REVIEWS,CODING,TRANSCRIPTS target
+          </pre>
+        </div>
+        <p class="caption">These entity names come from the specification’s Convex data model. The diagram does not imply that these tables or indexes exist in the current repository.</p>
       </section>
 
       <section id="deployment">
@@ -229,7 +249,7 @@ flowchart TB
   class CF1,CF2,CX,EBS target
           </pre>
         </div>
-        <p class="callout"><strong>Shared-dev caution:</strong> the Convex CLI is configured to target a shared service. Running it can sync backend changes for the whole team. Coordinate before running it. The local dashboard container described by the team is optional for viewing that remote service; it is separate from the spec’s production hosting plan. No credentials or environment values are included here.</p>
+        <p class="callout"><strong>Shared-dev caution:</strong> the Convex CLI is configured to target a shared service. Running it can sync backend changes for the whole team. Coordinate before running it. The local dashboard container described by the team is optional for viewing that remote service; it is separate from the spec’s production hosting plan. The spec also requires separate staging and production backend data. No credentials or environment values are included here.</p>
       </section>
 
       <section id="gaps">
