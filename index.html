@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="dark" />
     <meta name="description" content="A plain-language map of the OCS-27 repository today and the target architecture described in the OCS '27 specification." />
     <title>OCS ’27 · Repository and specification architecture</title>
     <style>
@@ -44,20 +44,190 @@
       .small { color: #5b6b7e; font-size: .92rem; }
       footer { max-width: 1120px; margin: 0 auto; color: #5b6b7e; padding: 0 1.2rem 2.5rem; font-size: .9rem; }
       @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+      :root {
+        color-scheme: dark;
+        color: #e7edf5;
+        background: #080c12;
+        --panel: #101720;
+        --border: #263447;
+        --muted: #99a9bc;
+        --text: #e7edf5;
+      }
+      html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+      body {
+        color: var(--text);
+        background:
+          radial-gradient(ellipse at 12% 0%, #172337 0, transparent 32rem),
+          radial-gradient(ellipse at 88% 10%, #14231e 0, transparent 28rem),
+          #080c12;
+      }
+      a { color: #a5cafa; }
+      a:hover { color: #d3e6ff; }
+      header {
+        background: linear-gradient(135deg, #0d1420 0%, #101b29 58%, #10221c 100%);
+        border-bottom: 1px solid #28384d;
+        padding-top: 2.4rem;
+        padding-bottom: 2.4rem;
+      }
+      header p { color: #b5c3d4; }
+      .eyebrow { color: #94bdfa; }
+      h1, h2, h3 { color: #f2f6fb; }
+      .page-shell {
+        display: grid;
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 1.15rem;
+        align-items: start;
+        max-width: 1460px;
+        margin: 0 auto;
+        padding: 1rem 1.2rem 3rem;
+      }
+      main { width: 100%; max-width: none; margin: 0; padding: 0; }
+      .side-nav {
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100vh - 2rem);
+        overflow: auto;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #0d131c;
+        box-shadow: 0 12px 34px #0005;
+      }
+      .nav-title { color: #f1f5fa; font-size: .9rem; font-weight: 800; margin-bottom: .8rem; }
+      .nav-search-label { display: block; color: var(--muted); font-size: .75rem; margin-bottom: .35rem; }
+      .nav-search {
+        width: 100%; border: 1px solid #33465d; border-radius: 8px;
+        background: #080d14; color: var(--text); padding: .62rem .7rem; outline: none;
+      }
+      .nav-search:focus { border-color: #78a9e7; box-shadow: 0 0 0 3px #78a9e733; }
+      .nav-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; margin: .65rem 0 1rem; }
+      .nav-actions button, .diagram-expand, .diagram-copy, .modal-close {
+        color: #dbe8f7; border: 1px solid #34475d; border-radius: 7px;
+        background: #172230; padding: .46rem .55rem; font: inherit; font-size: .74rem; cursor: pointer;
+      }
+      .nav-actions button:hover, .diagram-expand:hover, .diagram-copy:hover, .modal-close:hover { background: #22344a; border-color: #739bc9; }
+      .nav-links { display: grid; gap: .2rem; }
+      .nav-link {
+        display: block; color: #aab8c9; text-decoration: none; font-size: .82rem;
+        line-height: 1.35; padding: .48rem .58rem; border-radius: 7px; border-left: 2px solid transparent;
+      }
+      .nav-link:hover, .nav-link[aria-current="location"] {
+        color: #f1f6fc; background: #172231; border-left-color: #8db9f0;
+      }
+      .nav-note { color: #8292a6; font-size: .73rem; line-height: 1.45; margin: 1rem 0 0; }
+      section {
+        background: linear-gradient(180deg, #101720 0%, #0e151e 100%);
+        border-color: #263447; box-shadow: 0 10px 32px #0003; scroll-margin-top: 1rem;
+      }
+      p, li { color: #cfdae7; }
+      .lead { color: #e2eaf3; }
+      .current { background: #153023; color: #a7e9bc; }
+      .target { background: #342a17; color: #f4d38e; }
+      .external { background: #241f3b; color: #d0c7ff; }
+      .plain { background: #1b2633; color: #d1dce8; }
+      .badge, .legend span { border: 1px solid #334458; }
+      .diagram { position: relative; background: #0b1119; border-color: #28384b; }
+      .caption, .small { color: #97a7ba; }
+      .callout { color: #f0d69c; border-color: #ba9145; background: #251f14; }
+      .callout.blue { color: #d4e5fb; border-color: #5887c2; background: #131f2e; }
+      th, td { border-color: #273548; color: #cbd7e5; }
+      th { background: #151f2b; color: #e6edf5; }
+      code { color: #d9e7f7; background: #1a2634; }
+      .card { border-color: #28394d; background: #111a25; }
+      .card p { color: #c0cddd; }
+      .architecture-list { display: grid; gap: .8rem; }
+      .architecture-card {
+        border: 1px solid #2b3b50; border-radius: 12px; background: #0d141d; overflow: hidden;
+      }
+      .architecture-card[open] { border-color: #405975; }
+      .architecture-card summary {
+        cursor: pointer; list-style: none; padding: 1rem 1.05rem; color: #eaf1fa; font-weight: 750;
+        background: linear-gradient(90deg, #121e2b, #111923);
+      }
+      .architecture-card summary::-webkit-details-marker { display: none; }
+      .architecture-card summary::before {
+        content: "+"; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem;
+        margin-right: .65rem; color: #a9cafa; border: 1px solid #3c526c; border-radius: 5px;
+        font-family: ui-monospace, monospace;
+      }
+      .architecture-card[open] summary::before { content: "−"; }
+      .architecture-card summary:focus-visible, .nav-link:focus-visible, button:focus-visible, a:focus-visible {
+        outline: 2px solid #9bc4f5; outline-offset: 2px;
+      }
+      .architecture-body { padding: 0 1rem 1rem; }
+      .architecture-body > p:first-child { margin-top: .95rem; }
+      .diagram-tools { display: flex; justify-content: flex-end; gap: .45rem; margin-bottom: .65rem; }
+      .diagram-expand, .diagram-copy { display: block; margin: 0; }
+      .diagram-modal {
+        width: min(96vw, 1500px); max-width: none; max-height: 92vh; padding: 1rem; color: var(--text);
+        background: #0b1119; border: 1px solid #405975; border-radius: 14px;
+      }
+      .diagram-modal::backdrop { background: #02050bd9; backdrop-filter: blur(4px); }
+      .modal-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; }
+      #diagram-modal-content { overflow: auto; max-height: calc(88vh - 3.5rem); text-align: center; }
+      #diagram-modal-content svg { max-width: 100%; height: auto; }
+      .skip-link {
+        position: fixed; left: .75rem; top: .75rem; z-index: 100; padding: .6rem .8rem;
+        transform: translateY(-150%); color: #07101b; background: #a9cafa; border-radius: 7px;
+      }
+      .skip-link:focus { transform: translateY(0); }
+      footer { color: #8999ad; }
+      footer a { color: #a9cafa; }
+      [hidden] { display: none !important; }
+      @media (max-width: 900px) {
+        .page-shell { grid-template-columns: 190px minmax(0, 1fr); gap: .8rem; padding-inline: .8rem; }
+        .side-nav { padding: .75rem; }
+      }
+      @media (max-width: 700px) {
+        .page-shell { display: block; padding: .75rem; }
+        .side-nav { position: static; max-height: none; margin-bottom: .8rem; }
+        .nav-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        main { padding: 0; }
+        header { padding: 1.8rem 1rem; }
+        section { padding: 1rem; margin: .75rem 0; }
+        .architecture-body { padding-inline: .7rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="eyebrow">ACM-VIT · Organising Committee Selections 2026–27</p>
       <h1>OCS ’27: repository today, specification target</h1>
-      <p>This guide separates what is actually committed in the senior-maintained repository from what the technical specification says the product should become. The repository controls current folder names, frameworks, and implementation status. The specification describes the desired workflows and service boundaries.</p>
+      <p>This guide separates what is actually committed in the senior-maintained repository from what the technical specification says the product should become. It is a dark-only, interactive map for applicants, interviewers, reviewers, and developers. Search sections, expand component diagrams, and follow the source paths.</p>
       <div class="badges">
         <span class="badge current">Current repository · main at b7c491a</span>
         <span class="badge target">Specification · target behavior, not shipped code</span>
+        <span class="badge external">Tony UI-inspired · dark only</span>
       </div>
     </header>
 
-    <main>
+    <a class="skip-link" href="#repository">Skip to architecture</a>
+    <div class="page-shell">
+      <nav class="side-nav" aria-label="Architecture guide">
+        <div class="nav-title">Explore this guide</div>
+        <label class="nav-search-label" for="architecture-search">Search sections</label>
+        <input class="nav-search" id="architecture-search" type="search" placeholder="Try “ghost” or “Judge0”" autocomplete="off" />
+        <div class="nav-actions">
+          <button type="button" id="expand-diagrams">Open all</button>
+          <button type="button" id="collapse-diagrams">Close all</button>
+        </div>
+        <div class="nav-links">
+          <a class="nav-link" href="#repository">Repository today</a>
+          <a class="nav-link" href="#tree-differences">Repo vs spec paths</a>
+          <a class="nav-link" href="#applicant-flow">Applicant journey</a>
+          <a class="nav-link" href="#service-flow">Service boundaries</a>
+          <a class="nav-link" href="#deployment">Development and hosting</a>
+          <a class="nav-link" href="#feature-architecture">Detailed architecture</a>
+          <a class="nav-link" href="#gaps">Unbuilt work and rules</a>
+          <a class="nav-link" href="#evidence">Sources and evidence</a>
+        </div>
+        <p class="nav-note">Green is tracked code. Amber is the spec target. Purple is a separate service. This guide has a fixed dark theme.</p>
+      </nav>
+      <main>
       <section>
         <h2>How to read these diagrams</h2>
         <p class="lead">Green labels refer to tracked repository paths. Amber labels refer to specified work that is not implemented in this commit. Purple labels are separate services. Dotted arrows show intended integrations, not working connections in the current code.</p>
@@ -83,10 +253,10 @@ flowchart TB
   ROOT --> SFU["sfu/<br/>mediasoup + Socket.IO dependencies<br/>no SFU runtime"]
   ROOT --> WORKSPACE["Workspace files<br/>package.json · pnpm-workspace.yaml · pnpm-lock.yaml"]
   ROOT --> TOOLS["Root tooling files<br/>TypeScript config · Vite+ lint/format config"]
-  classDef root fill:#dfeafb,stroke:#476d9c,color:#152b45,stroke-width:2px
-  classDef app fill:#e6f5eb,stroke:#397e56,color:#173b25,stroke-width:2px
-  classDef package fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
-  classDef files fill:#edf2f8,stroke:#718096,color:#263648,stroke-width:1px
+  classDef root fill:#17263a,stroke:#739bc9,color:#eaf2fc,stroke-width:2px
+  classDef app fill:#153023,stroke:#55ba7c,color:#d9f4e2,stroke-width:2px
+  classDef package fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef files fill:#202a36,stroke:#7589a1,color:#e2eaf3,stroke-width:1px
   class ROOT root
   class PORTAL,DASH app
   class BACKEND,SFU package
@@ -145,9 +315,9 @@ flowchart TB
   OUTCOME -->|Rejected| STOP["End this domain path"]
   OUTCOME -->|Not announced yet| HIDDEN["Applicant sees no internal result"]
   NEXT --> ROUND
-  classDef person fill:#e8f1ff,stroke:#3875bd,color:#152b45,stroke-width:2px
-  classDef target fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
-  classDef decision fill:#eeeaff,stroke:#6558b5,color:#29204f,stroke-width:2px
+  classDef person fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef decision fill:#251f3c,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
   class CANDIDATE person
   class SIGNIN,ENROLL,ROUND,FORM,INTERVIEW,TASK,CODE,CHECK,REVIEW,NEXT,STOP,HIDDEN target
   class TYPE,OUTCOME decision
@@ -188,10 +358,10 @@ flowchart TB
   CONVEX -. "safe applicant view" .-> PORTAL
   CONVEX -. "review data and actions" .-> DASH
   SFU -. "not the Conclave runtime" .-> CONCLAVE
-  classDef app fill:#e6f5eb,stroke:#397e56,color:#173b25,stroke-width:2px
-  classDef package fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
-  classDef core fill:#dfeafb,stroke:#476d9c,color:#152b45,stroke-width:2px
-  classDef external fill:#eeeaff,stroke:#6558b5,color:#29204f,stroke-width:2px
+  classDef app fill:#153023,stroke:#55ba7c,color:#d9f4e2,stroke-width:2px
+  classDef package fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef core fill:#17263a,stroke:#739bc9,color:#eaf2fc,stroke-width:2px
+  classDef external fill:#251f3c,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
   class PORTAL,DASH app
   class BACKEND,SFU package
   class CONVEX,DATA core
@@ -212,7 +382,7 @@ flowchart TB
   STATE --> REVIEWS["Operations<br/>comments · notifications"]
   STATE --> CODING["Coding<br/>codingContests · codingSubmissions"]
   STATE --> TRANSCRIPTS["Interview context<br/>transcripts · transcriptSegments"]
-  classDef target fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
   class STATE,IDENTITY,FORMS,SCHEDULING,TASKS,REVIEWS,CODING,TRANSCRIPTS target
           </pre>
         </div>
@@ -241,9 +411,9 @@ flowchart TB
     CF2 --> CX
     CX --> EBS["SQLite files on persistent EBS"]
   end
-  classDef app fill:#e6f5eb,stroke:#397e56,color:#173b25,stroke-width:2px
-  classDef dev fill:#dfeafb,stroke:#476d9c,color:#152b45,stroke-width:2px
-  classDef target fill:#fff1d5,stroke:#bb8425,color:#5f3e0b,stroke-width:2px
+  classDef app fill:#153023,stroke:#55ba7c,color:#d9f4e2,stroke-width:2px
+  classDef dev fill:#17263a,stroke:#739bc9,color:#eaf2fc,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
   class PLOCAL,DLOCAL,PPROD,DPROD app
   class CLI,SHARED dev
   class CF1,CF2,CX,EBS target
@@ -252,8 +422,289 @@ flowchart TB
         <p class="callout"><strong>Shared-dev caution:</strong> the Convex CLI is configured to target a shared service. Running it can sync backend changes for the whole team. Coordinate before running it. The local dashboard container described by the team is optional for viewing that remote service; it is separate from the spec’s production hosting plan. The spec also requires separate staging and production backend data. No credentials or environment values are included here.</p>
       </section>
 
+      <section id="feature-architecture">
+        <h2>6. Detailed architecture, one part at a time</h2>
+        <p class="lead">These are the intended 2027 workflows from the spec, mapped to the real repository packages. The diagrams are target designs: the current repository still has placeholder web pages and package manifests only.</p>
+        <div class="legend">
+          <span class="current">Current code path</span>
+          <span class="target">Specified target or requested addition</span>
+          <span class="external">Separate service</span>
+        </div>
+        <p class="callout blue"><strong>How to explore:</strong> open a heading to see that component’s flow. Use the search box to jump to terms such as <code>ghost</code>, <code>Judge0</code>, or <code>transcript</code>. “Open all” and “Close all” control these diagrams.</p>
+
+        <div class="architecture-list">
+          <details class="architecture-card" open data-search="google oauth vitstudent auth applicant reviewer admin role rbac permissions audit">
+            <summary>1. Sign-in, identity, and role permissions</summary>
+            <div class="architecture-body">
+              <p>All users sign in with Google using an <code>@vitstudent.ac.in</code> account. Convex derives the signed-in identity from its verified session. Every protected function checks the caller’s role and record scope; hiding a button in the UI is not authorization.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  PERSON["Applicant or OCS staff"] --> GOOGLE["Google sign-in"]
+  GOOGLE --> DOMAIN{"Verified email ends in<br/>@vitstudent.ac.in?"}
+  DOMAIN -->|No| DENY["Reject access"]
+  DOMAIN -->|Yes| SESSION["Authenticated identity"]
+  SESSION --> CONVEX["backend/ Convex functions<br/>derive caller from session"]
+  CONVEX --> ROLE{"Stored role and requested action?"}
+  ROLE -->|Applicant| APPLICANT["Own profile and application only"]
+  ROLE -->|Reviewer| REVIEW["Assigned review access"]
+  ROLE -->|Administrator| ADMIN["Granted administrative actions"]
+  ROLE -->|Observer permission| OBSERVER["interview.observe<br/>for this interview only"]
+  ADMIN --> CHANGE["Authorized role grant or removal"]
+  CHANGE --> AUDIT["Audit actor, target, scope, and time"]
+  OBSERVER --> MEET["Short-lived, interview-scoped<br/>Conclave observer access"]
+  classDef person fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef decision fill:#251f3c,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
+  class PERSON person
+  class GOOGLE,SESSION,CONVEX,APPLICANT,REVIEW,ADMIN,OBSERVER,CHANGE,AUDIT,MEET target
+  class DOMAIN,ROLE,DENY decision
+              </pre></div>
+              <p class="caption">The spec defines Applicant, Reviewer, and Administrator roles and requires backend checks. The interview-scoped observer permission and audited role-management action are the proposed RBAC detail for the ghost-mode request; the current repo does not implement either.</p>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="applicant domains enrollment aois forms drafts validation submission results progression rounds task coding contest">
+            <summary>2. Applicant journey: domains, forms, rounds, results, and tasks</summary>
+            <div class="architecture-body">
+              <p>The backend chooses the next action from persisted round configuration. Applicants can save drafts, submit work, book interviews, take the coding contest, and submit assigned tasks. Results remain hidden until announced.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  SIGNIN["Google sign-in<br/>eligible VIT account"] --> HOME["portal/ applicant app"]
+  HOME --> DOMAINS["List five domains<br/>cc · Tech · Design · Research · Management"]
+  DOMAINS --> ENROLL["Enroll in configured domain<br/>backend enforces limits and deduplicates"]
+  ENROLL --> AOI["Select up to two AOIs<br/>where that domain uses AOIs"]
+  AOI --> ROUND["Load current configured round"]
+  ROUND --> KIND{"Round type"}
+  KIND -->|Form| FORM["Load questions and rules<br/>save draft responses"]
+  FORM --> SUBMIT["Validate on backend<br/>final submit locks answers"]
+  KIND -->|Interview| BOOK["Check eligibility<br/>choose and atomically book a slot"]
+  KIND -->|Task| TASK["View assigned task<br/>submit before deadline"]
+  KIND -->|Coding contest| CONTEST["Open cc contest<br/>server checks contest window"]
+  SUBMIT --> EVALUATE["Move application to evaluation"]
+  BOOK --> EVALUATE
+  TASK --> EVALUATE
+  CONTEST --> EVALUATE
+  EVALUATE --> REVIEW["Reviewer or administrator<br/>reviews through dash/"]
+  REVIEW --> DECISION{"Decision and announcement"}
+  DECISION -->|Promoted and announced| NEXT["Unlock next configured round"]
+  DECISION -->|Rejected and announced| STOP["End this domain path"]
+  DECISION -->|Not announced| PRIVATE["Applicant sees no internal result"]
+  NEXT --> ROUND
+  classDef person fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef decision fill:#251f3c,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
+  class SIGNIN,HOME,DOMAINS,ENROLL,AOI,ROUND,FORM,SUBMIT,BOOK,TASK,CONTEST,EVALUATE,REVIEW,NEXT,STOP,PRIVATE person
+  class KIND,DECISION decision
+              </pre></div>
+              <p class="caption">The five domains are Competitive Coding (<code>cc</code>), Tech, Design, Research, and Management. Tech, Design, and Research use AOIs; each applicable selection is limited to two. Round types are form, interview, task, and coding contest.</p>
+              <ul>
+                <li>Forms support short text, long text, single choice, and multiple choice; configured rules include required, min, max, conditional required, pattern, and custom validation.</li>
+                <li>Draft saves verify ownership and editability. Final submit revalidates the full answer set and is idempotent.</li>
+                <li>Task submissions verify applicant ownership, active round, non-empty response, validation, and deadline.</li>
+                <li>Promotion and rejection are guarded backend state transitions. Applicant queries return only announced results.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="interview scheduling booking slot capacity conclave meeting join wait waiting room host admission ghost observer invisible applicant roster media">
+            <summary>3. Interview booking, Conclave, and ghost observers</summary>
+            <div class="architecture-body">
+              <p>OCS owns eligibility, slot booking, applicant context, and access decisions. Conclave owns the meeting room, waiting state, host admission, participant lifecycle, and media. The applicant can join only after Convex authorizes the booked interview; a room ID alone is never enough.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  APPLICANT["Applicant in portal/"] --> SCHEDULER["Convex checks promoted state,<br/>interview round, and available slots"]
+  SCHEDULER --> BOOK["Atomic booking<br/>one applicant, one capacity place"]
+  BOOK --> CONTEXT["dash/ opens interview context<br/>identity · answers · comments · attendance"]
+  APPLICANT --> JOIN["Request interview access"]
+  JOIN --> GATE["Convex verifies identity, booking owner,<br/>interview match, valid round, and join window"]
+  GATE -->|Allowed| GRANT["Short-lived join authorization<br/>bound to this interview and room"]
+  GATE -->|Denied| ERROR["Clear reason<br/>ineligible · early · missing booking · service error"]
+  GRANT --> WAIT["Conclave waiting room"]
+  HOST["Authorized interviewer"] --> ROOM["Conclave room<br/>host admits applicant"]
+  WAIT --> ROOM
+  ROOM --> VISIBLE["Applicant sees the visible interview panel"]
+  STAFF["Assigned interviewer or reviewer"] --> DASH["dash/ requests observer access"]
+  DASH --> SCOPE["Convex checks interview.observe<br/>and active interview assignment"]
+  SCOPE --> OG["Short-lived observer grant<br/>for this room only"]
+  OG --> ROOM
+  ROOM --> GHOST["Ghost observer receives room media<br/>no mic · camera · screen · chat<br/>reactions · or hand raise"]
+  ROOM --> FILTER["Conclave hides ghost names, count,<br/>and join/leave events from applicant roster"]
+  ROOM --> STAFFVIEW["Authorized staff retain full roster<br/>and audit record"]
+  FILTER --> VISIBLE
+  GHOST --> STAFFVIEW
+  classDef current fill:#153023,stroke:#55ba7c,color:#d9f4e2,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef external fill:#241f3b,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
+  class APPLICANT,HOST,STAFF current
+  class SCHEDULER,BOOK,CONTEXT,JOIN,GATE,GRANT,ERROR,DASH,SCOPE,OG,GHOST,FILTER,STAFFVIEW target
+  class WAIT,ROOM,VISIBLE external
+              </pre></div>
+              <p class="callout"><strong>Ghost mode is an addition requested for OCS ’27.</strong> The spec describes Conclave rooms, host controls, and interview authorization, but does not name ghost observers. OCS can authorize an observer; Conclave must enforce receive-only media, roster/count filtering, hidden join/leave events, and staff audit visibility. The applicant should be told that authorized panel members may observe, even when the live roster does not show them.</p>
+              <p class="caption">The spec sets a configurable join window, defaulting to 15 minutes before the slot. OCS stores room and meeting identifiers plus authorization metadata; it does not copy Conclave media-session state.</p>
+              <h3>What last year’s portal did</h3>
+              <p>The 2025–26 Explore ACM-VIT portal linked a booked scheduler slot to its in-app Meets client and minted an authenticated, expiring SFU join token. Its own mediasoup/Socket.IO SFU—not the 2027 Conclave service—owned the meeting. Its admin-only Ghost Mode hid ghost participants from ordinary roster snapshots and locked their mic, camera, screen share, and hand controls; server handlers also rejected chat and reactions.</p>
+              <p class="small"><a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/scheduler-client.tsx#L387">Old scheduler join flow</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/components/landing/tab.tsx#L508">Meeting opens in the old portal</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/sfu-join.ts#L12">Authenticated SFU token</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/meets/components/JoinScreen.tsx#L211">Ghost toggle</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/joinRoom.ts#L56">Server-side ghost/admin check</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/config/classes/Room.ts#L65">Roster filtering</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/chatHandlers.ts#L23">Ghost chat restriction</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/meeting-admin-actions.ts#L319">Attendance and operator actions</a></p>
+              <p class="caption">For 2027, reuse the old user experience and its server-side restrictions, but put room access behind OCS booking authorization and implement the hidden observer role inside Conclave.</p>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="judge0 coding contest competitive coding cc sandbox execution interviewer portal hidden tests code">
+            <summary>4. Judge0: applicant contest and interviewer coding workspace</summary>
+            <div class="architecture-body">
+              <p>Both coding experiences use the same server-side Judge0 adapter, but each request has a distinct scope. The applicant contest is configured by a coding round. The interviewer workspace is opened from an authorized Conclave interview.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  subgraph CONTEST["A. Competitive Coding contest for cc applicants"]
+    CANDIDATE["Applicant in portal/"] --> CONTESTCHECK["Convex checks enrollment,<br/>contest window, attempts, and rate"]
+    CONTESTCHECK --> CONTESTREQ["Store scoped submission<br/>source · language · problem · correlation ID"]
+    CONTESTREQ --> JUDGEADAPTER["backend/ Judge0 adapter<br/>server holds Judge0 credentials"]
+    JUDGEADAPTER --> JUDGE0["Judge0 sandbox<br/>CPU · memory · time · output limits"]
+    JUDGE0 --> CONTESTRESULT["Save status, verdict, score,<br/>and permitted result"]
+    CONTESTRESULT --> SCORE["Applicant history / scoreboard<br/>only if contest policy enables it"]
+  end
+  subgraph INTERVIEW["B. Interview coding from Conclave context"]
+    INTERVIEWER["Authorized interviewer"] --> WORKSPACE["Open coding workspace<br/>from active Conclave interview"]
+    WORKSPACE --> ACCESS["Convex verifies interviewer role,<br/>applicant, round, and active booking"]
+    ACCESS --> CODEREQ["Run candidate code<br/>public tests or authorized hidden tests"]
+    CODEREQ --> JUDGEADAPTER
+    JUDGE0 --> INTERVIEWRESULT["Return interview-scoped verdict<br/>and allowed output"]
+    INTERVIEWRESULT --> ASSESSMENT["Record problem, submission reference,<br/>notes, and assessment in OCS"]
+    ACCESS --> WORKSPACE
+  end
+  HIDDEN["Hidden inputs and expected outputs<br/>remain server-side"] -.-> JUDGE0
+  CANDVIEW["Candidate sees only feedback<br/>allowed by interview policy"]
+  INTERVIEWRESULT --> CANDVIEW
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef service fill:#241f3b,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
+  classDef actor fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  class CANDIDATE,INTERVIEWER actor
+  class CONTESTCHECK,CONTESTREQ,CONTESTRESULT,SCORE,WORKSPACE,ACCESS,CODEREQ,INTERVIEWRESULT,ASSESSMENT,HIDDEN,CANDVIEW target
+  class JUDGEADAPTER,JUDGE0 service
+              </pre></div>
+              <ul>
+                <li><strong>Contest:</strong> configured problem set, languages, contest start/end, execution limits, attempt policy, scoring, submission history, verdicts, and optional scoreboard.</li>
+                <li><strong>Interviewer workspace:</strong> present problems, review candidate code, run code, discuss output, optionally run hidden tests when authorized, and write assessment back to OCS.</li>
+                <li><strong>Security:</strong> the browser never receives Judge0 credentials. The backend assigns the correlation ID, enforces rate and resource limits, stores results by contest/interview scope, and never exposes hidden tests to applicants.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="conclave intelligence ai transcript ingestion segments citations evidence query retention privacy redaction">
+            <summary>5. Conclave transcript and reviewer assistance</summary>
+            <div class="architecture-body">
+              <p>Conclave may deliver a transcript after or during an interview. OCS verifies its source, stores citation-ready segments under the correct interview, applies retention rules, and lets only authorized staff query that interview context. AI supports review; people make selection decisions.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart LR
+  CONCLAVE["Conclave transcript event"] --> VERIFY["backend/ verifies integration identity,<br/>meeting, interview, applicant, and round"]
+  VERIFY --> DEDUPE["Idempotent ingestion<br/>reject duplicate event"]
+  DEDUPE --> PRIVACY["Redact and apply retention policy"]
+  PRIVACY --> SEGMENTS["transcripts + transcriptSegments<br/>speaker · timestamps · version"]
+  SEGMENTS --> INDEX["Interview-scoped search index"]
+  REVIEWER["Authorized reviewer in dash/"] --> QUERY["Ask a question<br/>optional speaker/time/topic filters"]
+  QUERY --> AUTHZ["Convex checks reviewer access<br/>to this interview"]
+  AUTHZ --> RETRIEVE["Retrieve permitted segments"]
+  INDEX --> RETRIEVE
+  RETRIEVE --> AI["AI provider"]
+  AI --> ANSWER["Answer with segment IDs,<br/>timestamps, excerpts, confidence"]
+  ANSWER --> HUMAN["Reviewer verifies evidence<br/>and writes an optional note"]
+  HUMAN --> REVIEWER
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef external fill:#241f3b,stroke:#9a88f5,color:#ede9ff,stroke-width:2px
+  classDef actor fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  class CONCLAVE,AI external
+  class REVIEWER actor
+  class VERIFY,DEDUPE,PRIVACY,SEGMENTS,INDEX,QUERY,AUTHZ,RETRIEVE,ANSWER,HUMAN target
+              </pre></div>
+              <p class="caption">Transcript queries are interview-scoped and cite their evidence. AI must not promote or reject applicants, verify attendance, assign tasks, or otherwise change applicant state. Raw transcript access, derived indexes, provider requests, and reviewer notes have separate privacy controls and retention policy.</p>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="dashboard dash overview applicants domains rounds interviews tasks reviews search profile attendance comments promotion rejection notifications audit">
+            <summary>6. Operator dashboard, tasks, and audit trail</summary>
+            <div class="architecture-body">
+              <p><code>dash/</code> is the staff work surface. It reads one applicant profile with their applications, round history, AOIs, forms, interviews, attendance, tasks, submissions, and internal comments. Each write returns to a role-checked Convex function; the browser never writes directly to database documents.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  STAFF["Reviewer or administrator"] --> DASH["dash/ operator dashboard<br/>Overview · Applicants · Domains · Rounds<br/>Interviews · Tasks · Reviews"]
+  DASH --> READS["Search and review<br/>name · email · registration number"]
+  READS --> CONVEX["backend/ Convex queries<br/>scope data to the staff role"]
+  CONVEX --> PROFILE["Applicant profile<br/>identity · domains · rounds · answers<br/>AOIs · interviews · attendance · tasks · comments"]
+  DASH --> WRITE["Requested staff action"]
+  WRITE --> CHECK["Convex checks role, target, scope,<br/>current state, and allowed transition"]
+  CHECK --> ACTION{"Action"}
+  ACTION -->|Review| COMMENT["Add internal comment"]
+  ACTION -->|Interview| ATTEND["Verify attendance<br/>or authorized booking correction"]
+  ACTION -->|Decision| RESULT["Promote or reject<br/>then announce under policy"]
+  ACTION -->|Task| ASSIGN["Assign or update task<br/>and deadline"]
+  ACTION -->|Coding| CODING["Open interview coding workspace"]
+  ACTION -->|Transcript| CONTEXT["Query cited interview context"]
+  COMMENT --> AUDIT["Record actor, applicant, action,<br/>state change, and timestamp"]
+  ATTEND --> AUDIT
+  RESULT --> AUDIT
+  ASSIGN --> AUDIT
+  CODING --> AUDIT
+  CONTEXT --> AUDIT
+  AUDIT --> STATE["Convex state and audit history"]
+  classDef actor fill:#192a3b,stroke:#79a9e7,color:#eaf2fc,stroke-width:2px
+  classDef target fill:#302615,stroke:#d9a94f,color:#fff0ca,stroke-width:2px
+  classDef core fill:#17263a,stroke:#739bc9,color:#eaf2fc,stroke-width:2px
+  class STAFF actor
+  class DASH,READS,PROFILE,WRITE,CHECK,ACTION,COMMENT,ATTEND,RESULT,ASSIGN,CODING,CONTEXT target
+  class CONVEX,AUDIT,STATE core
+              </pre></div>
+              <p class="caption">Applicant notifications are applicant-scoped; reviewer comments remain internal. Important operator actions are auditable. A Conclave or Judge0 outage leaves OCS booking and selection state unchanged.</p>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="backend functions api contracts convex applicant dashboard users current domains list applications enroll rounds forms aois scheduler tasks meetings results admin">
+            <summary>7. Backend functions the spec expects</summary>
+            <div class="architecture-body">
+              <p>These are capability names from the spec, not functions in the current <code>backend/</code> package. The real package currently has only its Convex dependency manifest.</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Caller</th><th>Function groups</th><th>What they do</th></tr></thead>
+                  <tbody>
+                    <tr><td>Applicant</td><td><code>users.current</code>, <code>domains.list</code>, <code>applications.mine / enroll</code>, <code>rounds.getApplicantState</code></td><td>Load own identity, eligible domains, enrollment, and current round.</td></tr>
+                    <tr><td>Applicant</td><td><code>forms.getQuestions / getSubmission / saveResponse / submit</code>, <code>aois.select / leave</code></td><td>Read questions, save drafts, submit once, and update allowed AOIs.</td></tr>
+                    <tr><td>Applicant</td><td><code>scheduler.getEligibleRounds / getSlots / getBooking / book</code></td><td>Find eligible interviews, inspect capacity, and atomically reserve a slot.</td></tr>
+                    <tr><td>Applicant</td><td><code>tasks.mine / submit</code>, <code>meetings.getInterviewState / createJoinAuthorization</code>, <code>results.mine</code></td><td>View and submit tasks, request scoped Conclave access, and read announced results.</td></tr>
+                    <tr><td>Reviewer / admin</td><td><code>admin.searchApplicants</code>, <code>admin.getApplicant / admin.getApplicantApplications / admin.getFormSubmission / admin.getComments / admin.getInterview / admin.getTask / admin.getRoundStats</code></td><td>Search and inspect only records allowed by the caller’s role and scope.</td></tr>
+                    <tr><td>Reviewer / admin</td><td><code>admin.addComment / admin.verifyAttendance / admin.promote / admin.reject / admin.assignTask / admin.updateTask</code></td><td>Perform guarded review, attendance, progression, and task actions.</td></tr>
+                    <tr><td>Interviewer / reviewer</td><td><code>admin.openCodingWorkspace</code>, <code>admin.queryInterviewContext</code></td><td>Open an authorized Judge0 workspace and retrieve cited transcript assistance.</td></tr>
+                    <tr><td>Proposed RBAC addition</td><td><code>admin.grantRole / revokeRole / grantInterviewObserver</code></td><td>Manage explicit role/capability grants with scope and audit. These names are suggested; the spec does not prescribe role-management function names.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="callout"><strong>Trust rule:</strong> applicant identity comes from the authenticated Convex session, never a client-supplied email or user ID. Convex functions enforce authorization, ownership, validation, concurrency, and state transitions for every request.</p>
+            </div>
+          </details>
+
+          <details class="architecture-card" data-search="database schema data model users rounds roundUsers aois questions validation forms interviews slots bookings tasks comments notifications coding transcripts transcriptSegments">
+            <summary>8. Data groups and what each one owns</summary>
+            <div class="architecture-body">
+              <p>The target Convex schema keeps workflow data in OCS and service-owned runtime state in its own service. Convex is authoritative for applicant selection, booking, tasks, review, and transcript access. Conclave owns live media-session state; Judge0 owns execution.</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Data group</th><th>Examples from the spec</th><th>Key rule</th></tr></thead>
+                  <tbody>
+                    <tr><td>Identity and access</td><td><code>users</code>, authenticated identity, role</td><td>Unique auth ID; verified email; role checked per backend call.</td></tr>
+                    <tr><td>Selection</td><td><code>rounds</code>, <code>roundUsers</code>, AOIs and applicant AOI selections</td><td>One applicant enrollment per round; stable domain IDs; max two AOIs when enabled.</td></tr>
+                    <tr><td>Forms</td><td><code>questions</code>, <code>validationRules</code>, <code>formSubmissions</code>, <code>responses</code></td><td>One response per question/submission; final submission is read-only and idempotent.</td></tr>
+                    <tr><td>Scheduling</td><td><code>interviews</code>, <code>slots</code>, <code>bookings</code></td><td>Capacity reserved atomically; only minimum Conclave room/meeting mapping retained.</td></tr>
+                    <tr><td>Tasks and review</td><td><code>tasks</code>, <code>taskSubmissions</code>, <code>comments</code>, <code>notifications</code></td><td>Tasks enforce deadline and ownership; comments are internal; notices are recipient-scoped.</td></tr>
+                    <tr><td>Coding</td><td><code>codingContests</code>, <code>codingSubmissions</code>, Judge0 correlation IDs</td><td>Every execution is scoped to contest or interview; secrets and hidden tests stay server-side.</td></tr>
+                    <tr><td>Interview intelligence</td><td><code>transcripts</code>, <code>transcriptSegments</code>, indexes and citations</td><td>Meeting, interview, applicant, and round linkage; retention and reviewer access enforced.</td></tr>
+                    <tr><td>Audit trail</td><td>Actor, target applicant, action, prior/new state, timestamp</td><td>Required for privileged actions; exact table/schema is left to implementation.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+
       <section id="gaps">
-        <h2>6. What the specification adds that this commit does not implement</h2>
+        <h2>7. What the specification adds that this commit does not implement</h2>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Capability in spec</th><th>Current evidence in the repository</th></tr></thead>
@@ -261,7 +712,7 @@ flowchart TB
               <tr><td>Google sign-in for eligible VIT users; backend role checks</td><td>No auth setup, identity functions, or role enforcement is tracked.</td></tr>
               <tr><td>Five domains, configurable rounds, AOIs, forms, drafts, submissions, results, and progression</td><td>No domain, round, form, response, or applicant-state model is tracked.</td></tr>
               <tr><td>Scheduler with eligibility checks and atomic slot booking</td><td>No interview slots, bookings, capacity checks, or scheduler UI is tracked.</td></tr>
-              <tr><td>Conclave room authorization, waiting room, and interview context</td><td>No Conclave adapter or meeting authorization exists. The current <code>sfu/</code> package is only a manifest.</td></tr>
+              <tr><td>Conclave room authorization, waiting room, interview context, and ghost observers</td><td>No Conclave adapter or meeting authorization exists. The current <code>sfu/</code> package is only a manifest. Ghost observers are not named in the 2027 spec; the proposed design is based on the old portal’s admin-only ghost implementation.</td></tr>
               <tr><td>Judge0 contest for Competitive Coding and interviewer coding portal</td><td>No Judge0 integration, coding UI, submission record, or verdict handling is tracked.</td></tr>
               <tr><td>Task assignment, deadlines, applicant submissions, and reviews</td><td>No task schema or task workflow is tracked.</td></tr>
               <tr><td>Transcript ingestion, scoped AI queries, citations, privacy, and retention</td><td>No transcript, AI, indexing, or retention implementation is tracked.</td></tr>
@@ -286,15 +737,137 @@ flowchart TB
           <li>Checked the complete tracked file tree, root workspace files, all four package manifests, both app root pages and layouts, and root Vite+ configuration.</li>
           <li>Read the complete OCS ’27 specification, sections 00–20. Its proposed directory tree and its Node/pnpm/Vite/command descriptions conflict with the checked-in repository; the product workflows are shown as targets.</li>
           <li>Specification source: <a href="https://ocs27-spec.n00bda.chatgpt.site/">ACM OCS ’27 technical specification</a> (reader access is protected; its password is not stored in this page).</li>
-          <li>Review date: 25 October 2026. This page documents the reviewed commit, not later repository changes.</li>
+          <li>Review date: 26 October 2026. The 2025–26 Explore ACM-VIT source was also checked for its scheduler-to-meeting flow, SFU authorization, and Ghost Mode implementation.</li>
         </ul>
         <p class="small">The shared development service was supplied by the team and has not been queried or modified during this review. No Convex CLI command, Docker command, or production deployment was run.</p>
       </section>
-    </main>
-    <footer>Public architecture guide · Update this file when the repository or approved specification changes. Never add credentials, environment values, applicant data, or private review data.</footer>
+      </main>
+    </div>
+<footer>Public architecture guide · Update this file when the repository or approved specification changes. Never add credentials, environment values, applicant data, or private review data. Visual reference: <a href="https://tony-ui.neeraj.fyi/">Tony UI</a>; its public source repository is <a href="https://github.com/NeerajCodz/tony-ui">tony-ui</a>. The linked site describes the component package as <code>@neerajcodz/tonyui</code>; I found no earlier name in the linked site or public repository. This standalone HTML borrows the dark visual treatment and uses native controls; it does not bundle Tony’s React component library.</footer>
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-      mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: "base", flowchart: { htmlLabels: true, curve: "basis" } });
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "dark",
+        themeVariables: {
+          darkMode: true,
+          background: "#080c12",
+          primaryColor: "#17263a",
+          primaryTextColor: "#eaf2fc",
+          primaryBorderColor: "#739bc9",
+          lineColor: "#809ab7",
+          secondaryColor: "#153023",
+          tertiaryColor: "#251f3c",
+          mainBkg: "#101720",
+          clusterBkg: "#101720",
+          clusterBorder: "#34475d",
+          titleColor: "#f2f6fb",
+          edgeLabelBackground: "#111923",
+          fontFamily: "Inter, system-ui, sans-serif"
+        },
+        flowchart: { htmlLabels: true, curve: "basis" }
+      });
+      for (const box of document.querySelectorAll(".diagram")) {
+        const source = box.querySelector("pre.mermaid");
+        if (source) box.dataset.mermaidSource = source.textContent.trim();
+      }
+      const architectureCards = [...document.querySelectorAll(".architecture-card")];
+      const initiallyClosed = architectureCards.filter((item) => !item.open);
+      initiallyClosed.forEach((item) => { item.open = true; });
+      await mermaid.run();
+      initiallyClosed.forEach((item) => { item.open = false; });
+
+      const search = document.getElementById("architecture-search");
+      const sections = [...document.querySelectorAll("main > section")];
+      const navLinks = [...document.querySelectorAll(".nav-link")];
+      search.addEventListener("input", () => {
+        const query = search.value.trim().toLowerCase();
+        for (const section of sections) {
+          section.hidden = query.length > 0 && !section.innerText.toLowerCase().includes(query);
+        }
+        for (const card of document.querySelectorAll(".architecture-card")) {
+          if (query && (card.innerText + " " + card.dataset.search).toLowerCase().includes(query)) {
+            card.open = true;
+          }
+        }
+      });
+      document.getElementById("expand-diagrams").addEventListener("click", () => {
+        document.querySelectorAll(".architecture-card").forEach((item) => { item.open = true; });
+      });
+      document.getElementById("collapse-diagrams").addEventListener("click", () => {
+        document.querySelectorAll(".architecture-card").forEach((item) => { item.open = false; });
+      });
+
+      const dialog = document.getElementById("diagram-modal");
+      const modalContent = document.getElementById("diagram-modal-content");
+      for (const box of document.querySelectorAll(".diagram")) {
+        const tools = document.createElement("div");
+        tools.className = "diagram-tools";
+        const expand = document.createElement("button");
+        expand.type = "button";
+        expand.className = "diagram-expand";
+        expand.textContent = "Expand diagram";
+        expand.setAttribute("aria-label", "Expand this architecture diagram");
+        expand.addEventListener("click", () => {
+          const svg = box.querySelector("svg");
+          if (!svg) return;
+          modalContent.replaceChildren(svg.cloneNode(true));
+          dialog.showModal();
+        });
+        const copy = document.createElement("button");
+        copy.type = "button";
+        copy.className = "diagram-copy";
+        copy.textContent = "Copy Mermaid";
+        copy.addEventListener("click", async () => {
+          let copied = false;
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(box.dataset.mermaidSource || "");
+              copied = true;
+            }
+          } catch {}
+          if (!copied) {
+            const input = document.createElement("textarea");
+            input.value = box.dataset.mermaidSource || "";
+            input.style.position = "fixed";
+            input.style.opacity = "0";
+            document.body.append(input);
+            input.select();
+            copied = document.execCommand("copy");
+            input.remove();
+          }
+          copy.textContent = copied ? "Copied!" : "Copy failed";
+          window.setTimeout(() => { copy.textContent = "Copy Mermaid"; }, 1600);
+        });
+        tools.append(expand, copy);
+        box.prepend(tools);
+      }
+      document.getElementById("close-diagram").addEventListener("click", () => dialog.close());
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const link of navLinks) {
+            if (link.getAttribute("href") === "#" + entry.target.id) {
+              link.setAttribute("aria-current", "location");
+            } else {
+              link.removeAttribute("aria-current");
+            }
+          }
+        }
+      }, { rootMargin: "-15% 0px -75% 0px" });
+      sections.forEach((section) => observer.observe(section));
     </script>
+    <dialog class="diagram-modal" id="diagram-modal" aria-label="Expanded architecture diagram">
+      <div class="modal-bar">
+        <strong>Architecture diagram</strong>
+        <button class="modal-close" type="button" id="close-diagram">Close</button>
+      </div>
+      <div id="diagram-modal-content"></div>
+    </dialog>
   </body>
 </html>
