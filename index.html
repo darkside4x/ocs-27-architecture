@@ -396,6 +396,23 @@ flowchart TB
           </pre>
         </div>
         <p class="caption">Dotted service arrows describe code contracts or specified integrations; they do not establish verified deployment. The first-party meeting code from <a href="https://github.com/ACM-VIT/OCS-27/pull/25">merged PR #25</a> lives inside OCS-27. Camera behavior and authenticated route navigation still need teammate verification. Coding credentials and hidden tests must stay server-side; AI advice must cite transcript evidence.</p>
+        <h3>Convex has two public entry points</h3>
+        <p>Both web apps need the API origin and the separate HTTP-actions origin. Application queries, mutations and subscriptions use <code>NEXT_PUBLIC_CONVEX_URL</code>. The apps’ <code>/api/auth/*</code> handlers forward sign-in and session requests to <code>NEXT_PUBLIC_CONVEX_SITE_URL</code>, which corresponds to the hosting configuration’s <code>CONVEX_SITE_ORIGIN</code>. A missing HTTP-actions URL can make the local auth handler fail even when the API URL is correct.</p>
+        <div class="diagram"><pre class="mermaid">
+flowchart TB
+  WEB["Portal or dashboard"] -->|Application data| API["Public Convex API origin<br/>NEXT_PUBLIC_CONVEX_URL"]
+  API -->|Reverse proxy| DATA["Convex API listener<br/>internal port 3210"]
+  WEB -->|Sign-in and session requests| NEXT["Next.js /api/auth/*<br/>auth proxy in each web app"]
+  NEXT -->|Forward HTTP requests| ACTIONS["Public HTTP-actions origin<br/>NEXT_PUBLIC_CONVEX_SITE_URL<br/>host config: CONVEX_SITE_ORIGIN"]
+  ACTIONS -->|Reverse proxy| HTTP["Convex HTTP-actions listener<br/>internal port 3211"]
+  HTTP --> AUTH["Better Auth routes<br/>session and Google OAuth callback"]
+  classDef app fill:#303030,stroke:#bdbdbd,color:#ffffff,stroke-width:2px
+  classDef service fill:#161616,stroke:#ffffff,color:#ffffff,stroke-width:2px
+  class WEB,NEXT app
+  class API,DATA,ACTIONS,HTTP,AUTH service
+        </pre></div>
+        <p class="caption">The two origins route to different listeners of the same Convex backend. Use the configured public HTTP-actions origin rather than appending the internal port to the API hostname. Put the value in each app’s ignored <code>.env.local</code> file and restart its development server. Real environment values are omitted from this public guide.</p>
+        <p class="small">A read-only canonical-URL lookup confirmed the development deployment’s two origins, and an unauthenticated request to its HTTP-actions <code>/api/auth/get-session</code> endpoint returned HTTP 200. This verifies that endpoint’s routing; complete Google sign-in and live meeting behavior still require separate testing.</p>
         <h3>Logical Convex data groups in the spec</h3>
         <p>The merged schema already defines profiles, settings, domains, applications, roles, rounds, forms, submissions, reviews, and comments. Merged PR #25 includes interview tables. Tasks, coding, and transcripts remain specification targets.</p>
         <div class="diagram">
@@ -419,7 +436,7 @@ flowchart TB
 
       <section id="deployment">
         <h2>5. Shared development setup versus the production target</h2>
-        <p>These are different environments. The team supplied a shared development Convex service, and <code>infra/aws/staging/</code> contains tracked Terraform and setup scripts. The specification separately names a desired production hosting layout. No runtime deployment was verified for this guide.</p>
+        <p>These are different environments. The team supplied a shared development Convex service, and <code>infra/aws/staging/</code> contains tracked Terraform and setup scripts. The specification separately names a desired production hosting layout. Only development endpoint metadata and an unauthenticated HTTP-actions session response were checked; complete OAuth and live meeting deployment remain unverified.</p>
         <div class="diagram">
           <pre class="mermaid">
 flowchart TB
@@ -794,7 +811,7 @@ flowchart TB
           <li>Specification source: <a href="https://ocs27-spec.n00bda.chatgpt.site/">ACM OCS ’27 technical specification</a> (reader access is protected; its password is not stored in this page).</li>
           <li>Review date: 29 October 2026. The 2025–26 Explore ACM-VIT source was checked for scheduler-to-meeting authorization and Ghost Mode behavior. The separate Conclave repository was consulted as a reference only.</li>
         </ul>
-        <p class="small">The shared development service was supplied by the team and has not been queried or modified during this review. No Convex CLI command, Docker command, or production deployment was run.</p>
+        <p class="small">The shared development service was checked through read-only canonical-URL metadata and an unauthenticated HTTP-actions session request. No shared database mutation, backend synchronization, Docker command, or production deployment was performed. Local environment files remain ignored and uncommitted.</p>
       </section>
       </main>
     </div>
