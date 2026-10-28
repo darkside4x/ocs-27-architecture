@@ -307,7 +307,7 @@ flowchart TB
               <tr><td><code>packages/</code> with shared UI/types/auth packages</td><td>No tracked <code>packages/</code> directory</td><td>The shared packages in the spec are proposed boundaries, not files available to import today.</td></tr>
               <tr><td><code>infra/</code>, <code>docs/</code>, <code>tooling/</code>, <code>.github/workflows/</code></td><td><code>infra/aws/staging/</code> exists; the other sample directories are absent</td><td>Staging has Terraform and setup scripts. Their presence does not establish a verified deployment.</td></tr>
               <tr><td><code>turbo.json</code></td><td>Not present</td><td>The root package has no <code>dev</code> script; each Next.js app defines its own <code>dev</code>, <code>build</code>, and <code>start</code> scripts.</td></tr>
-              <tr><td>No SFU package in the sample tree; Conclave is a separate platform</td><td><code>sfu/</code> with <code>mediasoup</code> and <code>socket.io</code> dependencies only</td><td>This package is not a working SFU and is not the independently maintained Conclave service described by the spec.</td></tr>
+              <tr><td>No SFU package in the sample tree; its separate Conclave example is not the 2027 implementation</td><td><code>sfu/</code> is the senior-maintained workspace path. Merged staging contains dependencies; draft PR #24 adds a first-party meeting server.</td><td>The OCS team is building its own meeting runtime inside this repository. The separate Conclave repository is only historical reference material.</td></tr>
               <tr><td>Node.js <code>22.22.0</code>; pnpm <code>11.18.0</code></td><td>Root requires Node <code>^24.11.0</code> and pins pnpm <code>12.15.0</code></td><td>For this checkout, the checked-in root manifest and workspace lockfile define the install contract.</td></tr>
               <tr><td><code>pnpm dev</code> starts both apps</td><td>Root has quality scripts but no <code>dev</code> script</td><td>Run a package’s own <code>dev</code> script from <code>portal/</code> or <code>dash/</code>.</td></tr>
               <tr><td>Cloudflare Workers and EC2/EBS production topology</td><td><code>infra/aws/staging/</code> Terraform and scripts</td><td>Tracked staging infrastructure does not verify the spec’s production topology.</td></tr>
@@ -356,36 +356,34 @@ flowchart TB
 
       <section id="service-flow">
         <h2>4. Service boundaries and data authority</h2>
-        <p>The spec makes the backend the authority for identity, permissions, round state, validation, booking capacity, tasks, and progression. The frontends present that state. Conclave owns the live meeting; Judge0 owns sandbox execution; AI helps reviewers but cannot make selection decisions.</p>
+        <p>The spec makes the backend the authority for identity, permissions, round state, validation, booking capacity, tasks, and progression. The frontends present that state. The first-party <code>sfu/</code> service in OCS-27 owns live meeting media; Judge0 owns sandbox execution; AI helps reviewers but cannot make selection decisions.</p>
         <div class="diagram">
           <pre class="mermaid">
 flowchart TB
-  subgraph REPO["Merged staging paths"]
-    PORTAL["portal/<br/>Next.js app; placeholder today"]
-    DASH["dash/<br/>Next.js app; placeholder today"]
-    BACKEND["backend/<br/>Convex schemas and policy helpers"]
-    SFU["sfu/<br/>media dependencies only today"]
+  subgraph REPO["OCS-27 workspace paths"]
+    PORTAL["portal/<br/>applicant booking + meeting screen<br/>draft PR #24"]
+    DASH["dash/<br/>staff controls + meeting screen<br/>draft PR #24"]
+    BACKEND["backend/<br/>Convex booking, roles, and join pass<br/>draft PR #24"]
+    SFU["sfu/<br/>first-party mediasoup + Socket.IO<br/>draft PR #24"]
   end
-  subgraph TARGET["Service boundaries and specified integrations"]
+  subgraph TARGET["Authoritative state and future integrations"]
     CONVEX["Self-hosted Convex service<br/>authoritative functions and state<br/>production target: EC2"]
     DATA["SQLite persistence<br/>stored on EBS"]
-    CONCLAVE["Conclave<br/>meeting room and media runtime"]
     JUDGE0["Judge0<br/>isolated code execution"]
     AI["AI provider<br/>review assistance only"]
   end
-  PORTAL -. "planned protected queries and mutations" .-> CONVEX
-  DASH -. "planned role-checked operator actions" .-> CONVEX
-  BACKEND -. "schema and future functions deploy from here" .-> CONVEX
+  PORTAL -. "booking + candidate join action" .-> CONVEX
+  DASH -. "staff actions + ghost grant" .-> CONVEX
+  BACKEND -. "functions deploy from here" .-> CONVEX
   CONVEX -->|"persists state"| DATA
-  CONVEX -. "draft: signed booking pass" .-> CONCLAVE
-  CONCLAVE -. "authorized transcript ingestion" .-> CONVEX
+  CONVEX -. "two-minute pass for booked person and room" .-> PORTAL
+  CONVEX -. "two-minute pass for authorized staff" .-> DASH
+  PORTAL -. "signed socket + WebRTC media" .-> SFU
+  DASH -. "signed socket + WebRTC media" .-> SFU
   CONVEX -. "scoped server-side execution" .-> JUDGE0
   JUDGE0 -. "execution status and verdict" .-> CONVEX
   CONVEX -. "authorized transcript context" .-> AI
   AI -. "answer with segment citations" .-> CONVEX
-  CONVEX -. "safe applicant view" .-> PORTAL
-  CONVEX -. "review data and actions" .-> DASH
-  SFU -. "not the Conclave runtime" .-> CONCLAVE
   classDef app fill:#303030,stroke:#bdbdbd,color:#ffffff,stroke-width:2px
   classDef package fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef core fill:#161616,stroke:#ffffff,color:#ffffff,stroke-width:2px
@@ -393,10 +391,10 @@ flowchart TB
   class PORTAL,DASH app
   class BACKEND,SFU package
   class CONVEX,DATA core
-  class CONCLAVE,JUDGE0,AI external
+  class JUDGE0,AI external
           </pre>
         </div>
-        <p class="caption">Dotted arrows show proposed or unverified runtime connections. The tracked <code>infra/aws/staging/</code> files do not prove a deployment. Local OCS commits for draft <a href="https://github.com/ACM-VIT/OCS-27/pull/24">PR #24</a> and published <a href="https://github.com/ACM-VIT/conclave/pull/242">Conclave PR #242</a> implement the signed interview handoff in code; the OCS commits are not published yet. Neither integration is merged or live-tested. Coding credentials and hidden tests must stay server-side; AI advice must cite its transcript evidence.</p>
+        <p class="caption">Dotted arrows show draft PR or specified connections, not verified deployment. The tracked <code>infra/aws/staging/</code> files do not prove a deployment. The first-party meeting implementation is reviewable in <a href="https://github.com/ACM-VIT/OCS-27/pull/24">draft PR #24</a>; it is not merged or live-tested. The separate Conclave PR was closed as the wrong repository boundary. Coding credentials and hidden tests must stay server-side; AI advice must cite transcript evidence.</p>
         <h3>Logical Convex data groups in the spec</h3>
         <p>The merged schema already defines profiles, settings, domains, applications, roles, rounds, forms, submissions, reviews, and comments. Draft PR #24 adds interview tables. Tasks, coding, and transcripts remain specification targets.</p>
         <div class="diagram">
@@ -453,7 +451,7 @@ flowchart TB
 
       <section id="feature-architecture">
         <h2>6. Detailed architecture, one part at a time</h2>
-        <p class="lead">These diagrams map the intended 2027 workflows onto the real repository packages. Merged staging has backend schemas and policy helpers. Local commits for draft OCS PR #24 contain interview scheduling, candidate and staff pages, and a signed Conclave handoff; Conclave PR #242 adds room and ghost enforcement. The OCS commits have not reached its PR yet. Neither integration is merged or live-tested. Judge0 and AI integrations remain targets.</p>
+        <p class="lead">These diagrams map the intended 2027 workflows onto the real repository packages. Merged staging has backend schemas and policy helpers. Draft PR #24 adds interview scheduling, candidate and staff pages, and its own meeting service in <code>sfu/</code>. That work has not been merged or live-tested. Judge0 and AI integrations remain targets.</p>
         <div class="legend">
           <span class="current">Current code path</span>
           <span class="target">Specified target or requested addition</span>
@@ -480,7 +478,7 @@ flowchart TB
   ROLE -->|Observer permission| OBSERVER["interviews.observe<br/>plus grant for one booking"]
   ADMIN --> CHANGE["Authorized role grant or removal"]
   CHANGE --> AUDIT["Audit actor, target, scope, and time"]
-  OBSERVER --> MEET["Short-lived, interview-scoped<br/>Conclave observer access"]
+  OBSERVER --> MEET["Short-lived, interview-scoped<br/>OCS meeting observer access"]
   classDef person fill:#202020,stroke:#eeeeee,color:#ffffff,stroke-width:2px
   classDef target fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef decision fill:#111111,stroke:#aaaaaa,color:#ffffff,stroke-width:2px
@@ -535,33 +533,35 @@ flowchart TB
             </div>
           </details>
 
-          <details class="architecture-card" data-search="interview scheduling booking slot capacity conclave meeting join wait waiting room host admission ghost observer invisible applicant roster media">
-            <summary>3. Interview booking, Conclave, and ghost observers</summary>
+          <details class="architecture-card" data-search="interview scheduling booking slot capacity first-party sfu meeting join wait waiting room host admission ghost observer invisible applicant roster media">
+            <summary>3. Interview booking, OCS meeting service, and ghost observers</summary>
             <div class="architecture-body">
-              <p>OCS owns eligibility, slot booking, applicant context, and access decisions. Conclave owns the meeting room, waiting state, host admission, participant lifecycle, and media. The applicant can join only after Convex authorizes the booked interview; a room ID alone is never enough.</p>
+              <p>Convex owns eligibility, slot booking, applicant context, and access decisions. The OCS <code>sfu/</code> service owns meeting rooms, waiting state, host admission, participant lifecycle, and media. The applicant can join only after Convex authorizes the booked interview; a room ID alone is never enough.</p>
               <div class="diagram"><pre class="mermaid">
 flowchart TB
   APPLICANT["Applicant in portal/"] --> SCHEDULER["Convex checks promoted state,<br/>interview round, and available slots"]
   SCHEDULER --> BOOK["Atomic booking<br/>one applicant, one capacity place"]
-  BOOK --> PRIVATE["One Conclave room per booking<br/>parallel candidates stay separate"]
+  BOOK --> PRIVATE["One OCS meeting room per booking<br/>parallel candidates stay separate"]
   PRIVATE --> CONTEXT["Staff context in draft #24<br/>identity · answers · comments · attendance"]
   APPLICANT --> JOIN["Request interview access"]
   JOIN --> GATE["Convex verifies identity, booking owner,<br/>interview match, valid round, and join window"]
   GATE -->|Allowed in draft PR| GRANT["Two-minute signed pass<br/>booking · room · person · role"]
   GATE -->|Denied| ERROR["Clear reason<br/>ineligible · early · missing booking · service error"]
-  GRANT --> WEB["Conclave web checks pass<br/>before issuing SFU token"]
-  WEB --> SFUGATE["Conclave SFU checks room and role<br/>room link alone is insufficient"]
+  GRANT --> WEB["portal/ or dash/ meeting screen<br/>reads pass from URL fragment"]
+  WEB --> SFUGATE["OCS sfu/ verifies signed pass<br/>room · booking · person · role · expiry"]
   SFUGATE --> WAIT["Candidate waits for host admission"]
   HOST["Authorized interviewer"] --> SFUGATE
-  SFUGATE --> ROOM["Booking-specific Conclave room<br/>host admits applicant"]
+  SFUGATE --> ROOM["Booking-specific OCS media room<br/>host admits applicant"]
   WAIT --> ROOM
   ROOM --> VISIBLE["Applicant sees the visible interview panel"]
-  STAFF["Assigned interviewer or reviewer"] --> DASH["dash/ requests observer access"]
+  STAFF["Authorized staff member"] --> DASH["dash/ requests observer access"]
   DASH --> SCOPE["Convex checks interviews.observe<br/>and booking-specific grant"]
   SCOPE --> OG["Expiring observer grant<br/>draft PR #24"]
   OG --> GRANT
-  ROOM --> GHOST["Ghost observer receives room media<br/>no mic · camera · screen · chat<br/>reactions · hand raise · transcript token"]
-  ROOM --> FILTER["Conclave hides ghost names, count,<br/>and join/leave events from applicant roster"]
+  ROOM --> GHOST["Ghost receives room media<br/>cannot publish mic · camera · screen<br/>or send chat · reactions · hand"]
+  ROOM --> FILTER["OCS SFU hides ghost names, count,<br/>and roster-change events from applicants"]
+  GRANT --> RENEW["Meeting screen renews every 45 seconds<br/>Convex rechecks role and grant"]
+  RENEW --> SFUGATE
   ROOM --> STAFFVIEW["Authorized staff retain full roster<br/>and audit record"]
   FILTER --> VISIBLE
   GHOST --> STAFFVIEW
@@ -569,22 +569,22 @@ flowchart TB
   classDef target fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef external fill:#383838,stroke:#dddddd,color:#ffffff,stroke-width:2px
   class APPLICANT,HOST,STAFF current
-  class SCHEDULER,BOOK,PRIVATE,CONTEXT,JOIN,GATE,GRANT,ERROR,DASH,SCOPE,OG,GHOST,FILTER,STAFFVIEW target
-  class WEB,SFUGATE,WAIT,ROOM,VISIBLE external
+  class SCHEDULER,BOOK,PRIVATE,CONTEXT,JOIN,GATE,GRANT,ERROR,DASH,SCOPE,OG,GHOST,FILTER,STAFFVIEW,RENEW target
+  class WEB,SFUGATE,WAIT,ROOM,VISIBLE current
               </pre></div>
-              <p class="callout"><strong>Ghost mode is an addition requested for OCS ’27.</strong> The spec describes Conclave rooms, host controls, and interview authorization, but does not name ghost observers. The draft code gives OCS authority over a grant and makes Conclave hide the observer from the applicant roster and count while blocking outgoing media, chat, reactions, hand controls, and transcript tokens. The applicant page tells candidates that authorized panel members may observe unseen.</p>
-              <p class="caption">Local OCS commits for draft PR #24 and published <a href="https://github.com/ACM-VIT/conclave/pull/242">Conclave PR #242</a> are code proposals, not a deployed integration. The OCS PR still shows its earlier foundation commit. Backend tests and TypeScript checks passed locally for OCS; Conclave's full suite and a live two-browser SFU join have not run. An already connected observer is not immediately disconnected when an OCS grant is revoked; the next token request is denied.</p>
+              <p class="callout"><strong>Ghost mode is an addition requested for OCS ’27.</strong> The spec describes meeting rooms, host controls, and interview authorization, but does not name ghost observers. Local OCS code gives Convex authority over a booking-specific grant and makes its own SFU hide the observer from the applicant roster and count while blocking outgoing media, chat, reactions, and hand controls. The applicant page tells candidates that authorized panel members may observe unseen.</p>
+              <p class="caption">This is reviewable code in draft OCS-27 PR #24, not a deployed integration. Backend tests, SFU policy tests, web TypeScript checks, and both web production builds pass locally; the native mediasoup worker, two-browser call, and network deployment have not been verified. A revoked observer loses access on the next capability renewal; an uncooperative connected client is disconnected when its current pass expires, at most two minutes later.</p>
               <h3>What last year’s portal did</h3>
-              <p>The 2025–26 Explore ACM-VIT portal linked a booked scheduler slot to its in-app Meets client and minted an authenticated, expiring SFU join token. Its own mediasoup/Socket.IO SFU—not the 2027 Conclave service—owned the meeting. Its admin-only Ghost Mode hid ghost participants from ordinary roster snapshots and locked their mic, camera, screen share, and hand controls; server handlers also rejected chat and reactions.</p>
+              <p>The 2025–26 Explore ACM-VIT portal linked a booked scheduler slot to its in-app Meets client and minted an authenticated, expiring SFU join token. Its own mediasoup/Socket.IO SFU owned the meeting. Its admin-only Ghost Mode hid ghost participants from ordinary roster snapshots and locked their mic, camera, screen share, and hand controls; server handlers also rejected chat and reactions.</p>
               <p class="small"><a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/scheduler-client.tsx#L387">Old scheduler join flow</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/components/landing/tab.tsx#L508">Meeting opens in the old portal</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/sfu-join.ts#L12">Authenticated SFU token</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/meets/components/JoinScreen.tsx#L211">Ghost toggle</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/joinRoom.ts#L56">Server-side ghost/admin check</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/config/classes/Room.ts#L65">Roster filtering</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/chatHandlers.ts#L23">Ghost chat restriction</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/meeting-admin-actions.ts#L319">Attendance and operator actions</a></p>
-              <p class="caption">For 2027, reuse the old user experience and its server-side restrictions, but put room access behind OCS booking authorization and implement the hidden observer role inside Conclave.</p>
+              <p class="caption">For 2027, reuse the old user experience and server-side restrictions within OCS-27 itself: Convex authorizes the booking and the first-party SFU enforces the hidden observer role.</p>
             </div>
           </details>
 
           <details class="architecture-card" data-search="judge0 coding contest competitive coding cc sandbox execution interviewer portal hidden tests code">
             <summary>4. Judge0: applicant contest and interviewer coding workspace</summary>
             <div class="architecture-body">
-              <p>Both coding experiences use the same server-side Judge0 adapter, but each request has a distinct scope. The applicant contest is configured by a coding round. The interviewer workspace is opened from an authorized Conclave interview.</p>
+              <p>Both coding experiences would use the same server-side Judge0 adapter, but each request has a distinct scope. The applicant contest is configured by a coding round. The interviewer workspace would open from an authorized OCS meeting.</p>
               <div class="diagram"><pre class="mermaid">
 flowchart TB
   subgraph CONTEST["A. Competitive Coding contest for cc applicants"]
@@ -595,8 +595,8 @@ flowchart TB
     JUDGE0 --> CONTESTRESULT["Save status, verdict, score,<br/>and permitted result"]
     CONTESTRESULT --> SCORE["Applicant history / scoreboard<br/>only if contest policy enables it"]
   end
-  subgraph INTERVIEW["B. Interview coding from Conclave context"]
-    INTERVIEWER["Authorized interviewer"] --> WORKSPACE["Open coding workspace<br/>from active Conclave interview"]
+  subgraph INTERVIEW["B. Interview coding from OCS meeting context"]
+    INTERVIEWER["Authorized interviewer"] --> WORKSPACE["Open coding workspace<br/>from active OCS interview"]
     WORKSPACE --> ACCESS["Convex verifies interviewer role,<br/>applicant, round, and active booking"]
     ACCESS --> CODEREQ["Run candidate code<br/>public tests or authorized hidden tests"]
     CODEREQ --> JUDGEADAPTER
@@ -622,13 +622,13 @@ flowchart TB
             </div>
           </details>
 
-          <details class="architecture-card" data-search="conclave intelligence ai transcript ingestion segments citations evidence query retention privacy redaction">
-            <summary>5. Conclave transcript and reviewer assistance</summary>
+          <details class="architecture-card" data-search="ocs meeting intelligence ai transcript ingestion segments citations evidence query retention privacy redaction">
+            <summary>5. OCS meeting transcript and reviewer assistance</summary>
             <div class="architecture-body">
-              <p>Conclave may deliver a transcript after or during an interview. OCS verifies its source, stores citation-ready segments under the correct interview, applies retention rules, and lets only authorized staff query that interview context. AI supports review; people make selection decisions.</p>
+              <p>A future first-party meeting transcript can be stored under the correct interview with citation-ready segments and retention rules. Only authorized staff should query that context. AI supports review; people make selection decisions. No transcript recorder or AI path is implemented yet.</p>
               <div class="diagram"><pre class="mermaid">
 flowchart LR
-  CONCLAVE["Conclave transcript event"] --> VERIFY["backend/ verifies integration identity,<br/>meeting, interview, applicant, and round"]
+  MEETING["Future OCS meeting transcript event"] --> VERIFY["backend/ verifies room,<br/>booking, applicant, and round"]
   VERIFY --> DEDUPE["Idempotent ingestion<br/>reject duplicate event"]
   DEDUPE --> PRIVACY["Redact and apply retention policy"]
   PRIVACY --> SEGMENTS["transcripts + transcriptSegments<br/>speaker · timestamps · version"]
@@ -644,7 +644,8 @@ flowchart LR
   classDef target fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef external fill:#383838,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef actor fill:#202020,stroke:#eeeeee,color:#ffffff,stroke-width:2px
-  class CONCLAVE,AI external
+  class AI external
+  class MEETING actor
   class REVIEWER actor
   class VERIFY,DEDUPE,PRIVACY,SEGMENTS,INDEX,QUERY,AUTHZ,RETRIEVE,ANSWER,HUMAN target
               </pre></div>
@@ -685,7 +686,7 @@ flowchart TB
   class DASH,READS,PROFILE,WRITE,CHECK,ACTION,COMMENT,ATTEND,RESULT,ASSIGN,CODING,CONTEXT target
   class CONVEX,AUDIT,STATE core
               </pre></div>
-              <p class="caption">Applicant notifications are applicant-scoped; reviewer comments remain internal. Important operator actions are auditable. A Conclave or Judge0 outage leaves OCS booking and selection state unchanged.</p>
+              <p class="caption">Applicant notifications are applicant-scoped; reviewer comments remain internal. Important operator actions are auditable. An OCS meeting or Judge0 outage leaves booking and selection state unchanged.</p>
             </div>
           </details>
 
@@ -700,10 +701,10 @@ flowchart TB
                     <tr><td>Applicant</td><td><code>users.current</code>, <code>domains.list</code>, <code>applications.mine / enroll</code>, <code>rounds.getApplicantState</code></td><td>Load own identity, eligible domains, enrollment, and current round.</td></tr>
                     <tr><td>Applicant</td><td><code>forms.getQuestions / getSubmission / saveResponse / submit</code>, <code>aois.select / leave</code></td><td>Read questions, save drafts, submit once, and update allowed AOIs.</td></tr>
                     <tr><td>Applicant — draft #24</td><td><code>interviews.eligible / slots / myBookings / book / cancelBooking</code></td><td>Find eligible interviews, inspect capacity, and reserve one slot atomically.</td></tr>
-                    <tr><td>Applicant — local draft #24</td><td><code>meetingAccess.join</code> action; internal <code>meetings.candidateJoinState</code> query</td><td>Recheck booking ownership and join window server-side, then issue a two-minute signed pass for that applicant’s own room. The room-state query is not callable by browsers.</td></tr>
+                    <tr><td>Applicant — draft #24</td><td><code>meetingAccess.join</code> action; internal <code>meetings.candidateJoinState</code> query</td><td>Recheck booking ownership and join window server-side, then issue a two-minute signed pass for that applicant’s own room. The room-state query is not callable by browsers.</td></tr>
                     <tr><td>Applicant — spec target</td><td><code>tasks.mine / submit</code>, <code>results.mine</code></td><td>View tasks and announced results after those services are implemented.</td></tr>
                     <tr><td>Reviewer / admin</td><td><code>admin.searchApplicants</code>, <code>admin.getApplicant / admin.getApplicantApplications / admin.getFormSubmission / admin.getComments / admin.getInterview / admin.getTask / admin.getRoundStats</code></td><td>Search and inspect only records allowed by the caller’s role and scope.</td></tr>
-                    <tr><td>Staff — local draft #24</td><td><code>meetings.staffInterviews / staffBookings / staffContext / myObserverBookings / verifyAttendance / grantObserver / revokeObserver</code>; internal <code>interviewerJoinState / observerState</code></td><td>Inspect scoped bookings and context, issue staff or ghost room access through the join action, verify attendance, and manage booking-specific observer grants.</td></tr>
+                    <tr><td>Staff — draft #24</td><td><code>meetings.staffInterviews / staffBookings / staffContext / myObserverBookings / verifyAttendance / grantObserver / revokeObserver</code>; internal <code>interviewerJoinState / observerState</code></td><td>Inspect scoped bookings and context, issue staff or ghost room access through the join action, verify attendance, and manage booking-specific observer grants.</td></tr>
                     <tr><td>Staff — draft #24</td><td><code>interviews.configure / configureSlot / staffSlots</code></td><td>Set interview title, join window, dated slots and capacity; each booking gets a distinct room under the slot’s server-side room prefix.</td></tr>
                     <tr><td>Reviewer / admin — spec target</td><td><code>admin.addComment / promote / reject / assignTask / updateTask</code></td><td>Perform guarded review, progression, and task actions.</td></tr>
                     <tr><td>Interviewer / reviewer</td><td><code>admin.openCodingWorkspace</code>, <code>admin.queryInterviewContext</code></td><td>Open an authorized Judge0 workspace and retrieve cited transcript assistance.</td></tr>
@@ -718,7 +719,7 @@ flowchart TB
           <details class="architecture-card" data-search="database schema data model users rounds roundUsers aois questions validation forms interviews slots bookings tasks comments notifications coding transcripts transcriptSegments">
             <summary>8. Data groups and what each one owns</summary>
             <div class="architecture-body">
-              <p>Merged and draft Convex schemas keep selection and interview records in OCS; Conclave owns the live media session and Judge0 owns execution. Tasks, coding and transcript storage shown below are targets until their tables and handlers are merged.</p>
+              <p>Merged and draft Convex schemas keep selection and interview records in OCS; the first-party <code>sfu/</code> package handles live media and Judge0 would handle execution. Tasks, coding and transcript storage shown below are targets until their tables and handlers are merged.</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>Data group</th><th>Actual table or target</th><th>Key rule</th></tr></thead>
@@ -726,7 +727,7 @@ flowchart TB
                     <tr><td>Identity and access — merged</td><td><code>profiles</code>, <code>settings</code>, <code>roles</code>, <code>roleAssignments</code></td><td>Stable auth ID; verified eligible email; stored scoped grants.</td></tr>
                     <tr><td>Selection — merged</td><td><code>domains</code>, <code>applications</code>, <code>rounds</code>, <code>roundApplications</code>, AOIs</td><td>Stable domain keys; configured AOI limits are 1–3 where applicable.</td></tr>
                     <tr><td>Forms and review — merged</td><td><code>forms</code>, <code>draftAnswers</code>, <code>formSubmissions</code>, <code>reviewSnapshots</code>, <code>comments</code></td><td>Submissions and review evidence preserve history; current edit policy can permit resubmission.</td></tr>
-                    <tr><td>Scheduling — draft PR #24</td><td><code>interviews</code>, <code>interviewSlots</code>, <code>interviewBookings</code>, <code>interviewObserverGrants</code></td><td>Capacity is reserved atomically; a distinct Conclave room is derived for each booking and is revealed only to its authorized participant or staff caller.</td></tr>
+                    <tr><td>Scheduling — draft PR #24</td><td><code>interviews</code>, <code>interviewSlots</code>, <code>interviewBookings</code>, <code>interviewObserverGrants</code></td><td>Capacity is reserved atomically; a distinct OCS meeting room is derived for each booking and is revealed only to its authorized participant or staff caller.</td></tr>
                     <tr><td>Tasks and review</td><td><code>tasks</code>, <code>taskSubmissions</code>, <code>comments</code>, <code>notifications</code></td><td>Tasks enforce deadline and ownership; comments are internal; notices are recipient-scoped.</td></tr>
                     <tr><td>Coding</td><td><code>codingContests</code>, <code>codingSubmissions</code>, Judge0 correlation IDs</td><td>Every execution is scoped to contest or interview; secrets and hidden tests stay server-side.</td></tr>
                     <tr><td>Interview intelligence</td><td><code>transcripts</code>, <code>transcriptSegments</code>, indexes and citations</td><td>Meeting, interview, applicant, and round linkage; retention and reviewer access enforced.</td></tr>
@@ -748,7 +749,7 @@ flowchart TB
               <tr><td>Google sign-in for eligible VIT users; backend role checks</td><td>Merged staging has role schemas and policy helpers. Google/Better Auth is in open PR #23; it is not merged into staging.</td></tr>
               <tr><td>Five domains, configurable rounds, AOIs, forms, drafts, submissions, results, and progression</td><td>Merged staging has the foundation, form, review and comment schemas plus pure policy helpers. Applicant, form-admin and decision handlers are in separate open PRs #19, #22 and #18; the web pages are placeholders.</td></tr>
               <tr><td>Scheduler with eligibility checks and atomic slot booking</td><td>Draft PR <a href="https://github.com/ACM-VIT/OCS-27/pull/24">#24</a> adds interview slots, eligibility queries and an atomic booking mutation. Local unpublished commits add candidate and staff scheduling pages. Neither version is merged or deployed.</td></tr>
-              <tr><td>Conclave room authorization, waiting room, interview context, and ghost observers</td><td>Local OCS commits for draft PR #24 add a two-minute booking-bound pass, candidate and staff pages, context, attendance, and observer grants; they are not published to the PR yet. Conclave PR #242 checks the pass at web and SFU joins and hides receive-only ghosts. Neither integration is merged or live-tested. The OCS <code>sfu/</code> package remains a manifest.</td></tr>
+              <tr><td>First-party OCS meeting authorization, waiting room, interview context, and ghost observers</td><td>Draft PR #24 adds a two-minute booking-bound pass, candidate and staff meeting pages, context, attendance, and observer grants. New <code>sfu/</code> code verifies access, handles mediasoup rooms, and hides receive-only ghosts. It has not been merged or passed a live media test.</td></tr>
               <tr><td>Judge0 contest for Competitive Coding and interviewer coding portal</td><td>No Judge0 integration, coding UI, submission record, or verdict handling is tracked.</td></tr>
               <tr><td>Task assignment, deadlines, applicant submissions, and reviews</td><td>No task schema or task workflow is tracked.</td></tr>
               <tr><td>Transcript ingestion, scoped AI queries, citations, privacy, and retention</td><td>No transcript, AI, indexing, or retention implementation is tracked.</td></tr>
@@ -762,7 +763,7 @@ flowchart TB
           <div class="card"><h3>Backend owns decisions</h3><p>Derive identity from the authenticated session. Enforce roles, eligibility, validation, booking capacity, and progression in backend functions.</p></div>
           <div class="card"><h3>Protect applicant results</h3><p>Keep unannounced decisions out of applicant responses, counts, routes, and errors. Expose a safe server-side projection.</p></div>
           <div class="card"><h3>Keep retries safe</h3><p>Enrollment, form submission, slot booking, task assignment, and transcript ingestion need idempotency and concurrency protection.</p></div>
-          <div class="card"><h3>Keep service authority clear</h3><p>Conclave runs meetings, Judge0 executes code, OCS governs selection, and AI gives evidence-linked advice without changing applicant state.</p></div>
+          <div class="card"><h3>Keep service authority clear</h3><p>OCS <code>sfu/</code> runs meetings, Convex governs selection, Judge0 would execute code, and AI would give evidence-linked advice without changing applicant state.</p></div>
         </div>
       </section>
 
@@ -773,7 +774,7 @@ flowchart TB
           <li>Checked the tracked workspace tree, backend schemas, interview functions and tests, package manifests, both app root pages, staging infrastructure files, and open PR status. Draft code is identified separately from merged code.</li>
           <li>Read the complete OCS ’27 specification, sections 00–20. Its proposed directory tree and its Node/pnpm/Vite/command descriptions conflict with the checked-in repository; the product workflows are shown as targets.</li>
           <li>Specification source: <a href="https://ocs27-spec.n00bda.chatgpt.site/">ACM OCS ’27 technical specification</a> (reader access is protected; its password is not stored in this page).</li>
-          <li>Review date: 28 October 2026. The 2025–26 Explore ACM-VIT source and current Conclave join route were checked for scheduler-to-meeting authorization and Ghost Mode behavior.</li>
+          <li>Review date: 28 October 2026. The 2025–26 Explore ACM-VIT source was checked for scheduler-to-meeting authorization and Ghost Mode behavior. The separate Conclave repository was consulted as a reference only.</li>
         </ul>
         <p class="small">The shared development service was supplied by the team and has not been queried or modified during this review. No Convex CLI command, Docker command, or production deployment was run.</p>
       </section>
