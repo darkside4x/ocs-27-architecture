@@ -219,8 +219,9 @@
       <h1>OCS ’27: repository today, specification target</h1>
       <p>This guide separates what is actually committed in the senior-maintained repository from what the technical specification says the product should become. It is a dark-only, black-and-white interactive map for applicants, interviewers, reviewers, and developers. Search sections, expand component diagrams, and follow the source paths.</p>
       <div class="badges">
-        <span class="badge current">Current staging · 7bc209e</span>
-        <span class="badge plain">Interview PR · #25</span>
+        <span class="badge current">Current staging · d24b92d</span>
+        <span class="badge plain">Interviews merged · #25</span>
+        <span class="badge target">Draft route fix · #31</span>
         <span class="badge target">Specification · target behavior, not shipped code</span>
         <span class="badge plain">Monochrome · dark mode</span>
       </div>
@@ -262,22 +263,22 @@
           <span class="external">Independent service</span>
           <span class="plain">Boundary or explanation</span>
         </div>
-        <p class="callout blue">The spec’s sample directory tree is not this repository’s tree. This page uses the merged <code>staging</code> tree for paths and models; <code>main</code> and open PR #25 are called out separately.</p>
+        <p class="callout blue">The spec’s sample directory tree is not this repository’s tree. This page uses the merged <code>staging</code> tree for paths and models; <code>main</code> remains separate, and the route-validation follow-up for issue #30 is still a draft.</p>
       </section>
 
       <section id="repository">
         <h2>1. What is committed today</h2>
-        <p>Merged <code>staging</code> is commit <a href="https://github.com/ACM-VIT/OCS-27/tree/7bc209e">7bc209e</a>; <code>main</code> is <a href="https://github.com/ACM-VIT/OCS-27/tree/6f1e4ce">6f1e4ce</a>. The four workspace packages are <code>portal/</code>, <code>dash/</code>, <code>backend/</code>, and <code>sfu/</code>, with a separate <code>infra/</code> directory. Both web homepages still show “Hello world!”. Staging has Convex foundation, form, review, comment and role schemas plus policy helpers. Interview functions are in <a href="https://github.com/ACM-VIT/OCS-27/pull/25">open PR #25</a>, not merged.</p>
+        <p>Merged <code>staging</code> is commit <a href="https://github.com/ACM-VIT/OCS-27/tree/d24b92d">d24b92d</a>; <code>main</code> is <a href="https://github.com/ACM-VIT/OCS-27/tree/6f1e4ce">6f1e4ce</a>. The workspace packages are <code>portal/</code>, <code>dash/</code>, <code>backend/</code>, and <code>sfu/</code>, plus <code>infra/</code>. Staging includes Google sign-in (#23), first-party interviews and meetings (#25), staff form/round administration (#22), strict TypeScript and push checks (#29), and scoped dashboard queries (#21). The two root homepages remain placeholders; interview pages are implemented. Merged source does not establish a working deployment or a passed multi-user media test.</p>
         <div class="diagram">
           <pre class="mermaid">
 flowchart TB
   ROOT["OCS-27 root<br/>pnpm workspace"]
-  ROOT --> PORTAL["portal/<br/>Next.js App Router<br/>/ shows Hello world!"]
-  ROOT --> DASH["dash/<br/>Next.js App Router<br/>/ shows Hello world!"]
-  ROOT --> BACKEND["backend/<br/>Convex schemas and policy helpers<br/>merged on staging"]
-  ROOT --> SFU["sfu/<br/>mediasoup + Socket.IO dependencies<br/>no SFU runtime"]
+  ROOT --> PORTAL["portal/<br/>Next.js App Router<br/>auth + interviews + meetings<br/>root homepage is a placeholder"]
+  ROOT --> DASH["dash/<br/>Next.js App Router<br/>auth + interviews + meetings<br/>root homepage is a placeholder"]
+  ROOT --> BACKEND["backend/<br/>Convex auth, forms, interviews,<br/>dashboard queries + policy helpers"]
+  ROOT --> SFU["sfu/<br/>first-party mediasoup + Socket.IO<br/>meeting runtime merged on staging"]
   ROOT --> INFRA["infra/aws/staging/<br/>Terraform and setup scripts"]
-  BACKEND -. "open PR #25" .-> INTERVIEWS["Interview booking and guarded meeting state<br/>not merged or deployed"]
+  BACKEND --> INTERVIEWS["Interview booking and guarded meeting state<br/>merged source; runtime verification pending"]
   ROOT --> WORKSPACE["Workspace files<br/>package.json · pnpm-workspace.yaml · pnpm-lock.yaml"]
   ROOT --> TOOLS["Root tooling files<br/>TypeScript config · Vite+ lint/format config"]
   classDef root fill:#161616,stroke:#ffffff,color:#ffffff,stroke-width:2px
@@ -303,11 +304,11 @@ flowchart TB
             <tbody>
               <tr><td><code>apps/client/</code>, described as Vite</td><td><code>portal/</code>, Next.js App Router</td><td>The applicant-client role maps to <code>portal/</code>. Its current page is a placeholder; it is not the specified Vite app.</td></tr>
               <tr><td><code>apps/dash/</code></td><td><code>dash/</code>, Next.js App Router</td><td>The dashboard role maps to the root-level <code>dash/</code> package.</td></tr>
-              <tr><td><code>apps/backend/</code></td><td><code>backend/</code></td><td>Staging contains Convex schemas and policy helpers; interview functions are in open PR #25.</td></tr>
+              <tr><td><code>apps/backend/</code></td><td><code>backend/</code></td><td>Staging contains auth, schemas, form/round administration, dashboard queries, interview functions and policy helpers.</td></tr>
               <tr><td><code>packages/</code> with shared UI/types/auth packages</td><td>No tracked <code>packages/</code> directory</td><td>The shared packages in the spec are proposed boundaries, not files available to import today.</td></tr>
               <tr><td><code>infra/</code>, <code>docs/</code>, <code>tooling/</code>, <code>.github/workflows/</code></td><td><code>infra/aws/staging/</code> exists; the other sample directories are absent</td><td>Staging has Terraform and setup scripts. Their presence does not establish a verified deployment.</td></tr>
               <tr><td><code>turbo.json</code></td><td>Not present</td><td>The root package has no <code>dev</code> script; each Next.js app defines its own <code>dev</code>, <code>build</code>, and <code>start</code> scripts.</td></tr>
-              <tr><td>No SFU package in the sample tree; its separate Conclave example is not the 2027 implementation</td><td><code>sfu/</code> is the senior-maintained workspace path. Merged staging contains dependencies; open PR #25 adds a first-party meeting server.</td><td>The OCS team is building its own meeting runtime inside this repository. The separate Conclave repository is only historical reference material.</td></tr>
+              <tr><td>No SFU package in the sample tree; its separate Conclave example is not the 2027 implementation</td><td><code>sfu/</code> is the senior-maintained workspace path. Merged staging contains the first-party meeting server from PR #25.</td><td>The OCS team is building its own meeting runtime inside this repository. The separate Conclave repository is only historical reference material.</td></tr>
               <tr><td>Node.js <code>22.22.0</code>; pnpm <code>11.18.0</code></td><td>Root requires Node <code>^24.11.0</code> and pins pnpm <code>12.15.0</code></td><td>For this checkout, the checked-in root manifest and workspace lockfile define the install contract.</td></tr>
               <tr><td><code>pnpm dev</code> starts both apps</td><td>Root has quality scripts but no <code>dev</code> script</td><td>Run a package’s own <code>dev</code> script from <code>portal/</code> or <code>dash/</code>.</td></tr>
               <tr><td>Cloudflare Workers and EC2/EBS production topology</td><td><code>infra/aws/staging/</code> Terraform and scripts</td><td>Tracked staging infrastructure does not verify the spec’s production topology.</td></tr>
@@ -361,10 +362,10 @@ flowchart TB
           <pre class="mermaid">
 flowchart TB
   subgraph REPO["OCS-27 workspace paths"]
-    PORTAL["portal/<br/>applicant booking + meeting screen<br/>open PR #25"]
-    DASH["dash/<br/>staff controls + meeting screen<br/>open PR #25"]
-    BACKEND["backend/<br/>Convex booking, roles, and join pass<br/>open PR #25"]
-    SFU["sfu/<br/>first-party mediasoup + Socket.IO<br/>open PR #25"]
+    PORTAL["portal/<br/>applicant booking + meeting screen<br/>merged PR #25"]
+    DASH["dash/<br/>staff controls + meeting screen<br/>merged PR #25"]
+    BACKEND["backend/<br/>Convex booking, roles, and join pass<br/>merged PR #25"]
+    SFU["sfu/<br/>first-party mediasoup + Socket.IO<br/>merged PR #25"]
   end
   subgraph TARGET["Authoritative state and future integrations"]
     CONVEX["Self-hosted Convex service<br/>authoritative functions and state<br/>production target: EC2"]
@@ -394,26 +395,26 @@ flowchart TB
   class JUDGE0,AI external
           </pre>
         </div>
-        <p class="caption">Dotted arrows show open PR or specified connections, not verified deployment. The tracked <code>infra/aws/staging/</code> files do not prove a deployment. The first-party meeting implementation is reviewable in <a href="https://github.com/ACM-VIT/OCS-27/pull/25">open PR #25</a>; it is not merged or live-tested. The separate Conclave PR was closed as the wrong repository boundary. Coding credentials and hidden tests must stay server-side; AI advice must cite transcript evidence.</p>
+        <p class="caption">Dotted service arrows describe code contracts or specified integrations; they do not establish verified deployment. The first-party meeting code from <a href="https://github.com/ACM-VIT/OCS-27/pull/25">merged PR #25</a> lives inside OCS-27. Camera behavior and authenticated route navigation still need teammate verification. Coding credentials and hidden tests must stay server-side; AI advice must cite transcript evidence.</p>
         <h3>Logical Convex data groups in the spec</h3>
-        <p>The merged schema already defines profiles, settings, domains, applications, roles, rounds, forms, submissions, reviews, and comments. Open PR #25 adds interview tables. Tasks, coding, and transcripts remain specification targets.</p>
+        <p>The merged schema already defines profiles, settings, domains, applications, roles, rounds, forms, submissions, reviews, and comments. Merged PR #25 includes interview tables. Tasks, coding, and transcripts remain specification targets.</p>
         <div class="diagram">
           <pre class="mermaid">
 flowchart TB
   STATE["OCS Convex data model"]
   STATE --> IDENTITY["Merged staging<br/>profiles · domains · applications<br/>roles · rounds · AOIs"]
   STATE --> FORMS["Merged staging<br/>forms · drafts · submissions<br/>reviews · comments"]
-  STATE -. "open PR #25" .-> SCHEDULING["Interview records<br/>interviews · interviewSlots<br/>interviewBookings · observer grants"]
+  STATE --> SCHEDULING["Interview records<br/>interviews · interviewSlots<br/>interviewBookings · observer grants"]
   STATE -. "spec target" .-> TASKS["Tasks<br/>tasks · taskSubmissions"]
   STATE -. "spec target" .-> CODING["Coding<br/>contests · submissions"]
   STATE -. "spec target" .-> TRANSCRIPTS["Interview context<br/>transcripts · segments"]
   classDef current fill:#242424,stroke:#ffffff,color:#ffffff,stroke-width:2px
   classDef target fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
-  class STATE,IDENTITY,FORMS current
-  class SCHEDULING,TASKS,CODING,TRANSCRIPTS target
+  class STATE,IDENTITY,FORMS,SCHEDULING current
+  class TASKS,CODING,TRANSCRIPTS target
           </pre>
         </div>
-        <p class="caption">Solid lines are merged schema. The interview line points to open PR #25, which is reviewable code but not merged or deployed. Other dotted lines are specification targets.</p>
+        <p class="caption">Solid lines are merged schema, including interview tables. Dotted data-group lines are specification targets. Deployment and live behavior need separate verification.</p>
       </section>
 
       <section id="deployment">
@@ -451,7 +452,7 @@ flowchart TB
 
       <section id="feature-architecture">
         <h2>6. Detailed architecture, one part at a time</h2>
-        <p class="lead">These diagrams map the intended 2027 workflows onto the real repository packages. Merged staging has backend schemas and policy helpers. Open PR #25 adds interview scheduling, candidate and staff pages, and its own meeting service in <code>sfu/</code>. That work has not been merged or live-tested. Judge0 and AI integrations remain targets.</p>
+        <p class="lead">These diagrams map the intended 2027 workflows onto the actual repository packages. Staging now includes authentication, form administration, scoped dashboard queries, interview scheduling, candidate/staff interview pages and the first-party meeting service. The route-validation change for issue #30 is a draft follow-up; camera behavior remains a separate open issue. Judge0 and AI integrations remain targets.</p>
         <div class="legend">
           <span class="current">Current code path</span>
           <span class="target">Specified target or requested addition</span>
@@ -486,7 +487,7 @@ flowchart TB
   class GOOGLE,SESSION,CONVEX,APPLICANT,REVIEW,ADMIN,OBSERVER,CHANGE,AUDIT,MEET target
   class DOMAIN,ROLE,DENY decision
               </pre></div>
-              <p class="caption">Merged staging defines editable roles, assignments, scope checks and role audits. Open PR #25 adds <code>interviews.observe</code> and a booking-specific observer grant. Its branch includes pending Google/Better Auth PR #23 and now uses that trusted profile helper. PR #23 must merge before the interview branch is reconciled for merge.</p>
+              <p class="caption">Google/Better Auth from PR #23 and booking-specific observer access from PR #25 are merged. Staging includes role schemas and scope helpers; the event-scoped RBAC administration APIs remain in separate PR #26. New sign-ins receive no staff permissions automatically.</p>
             </div>
           </details>
 
@@ -523,7 +524,7 @@ flowchart TB
   class SIGNIN,HOME,DOMAINS,ENROLL,AOI,ROUND,FORM,SUBMIT,BOOK,TASK,CONTEST,EVALUATE,REVIEW,NEXT,STOP,PRIVATE person
   class KIND,DECISION decision
               </pre></div>
-              <p class="caption">The five domains are Competitive Coding (<code>cc</code>), Tech, Design, Research, and Management. The merged configuration allows 1–3 AOIs in Tech, Design, and Research. Merged rounds currently model forms; open PR #25 adds interview as a round type. Task and coding-contest round types remain targets.</p>
+              <p class="caption">The five domains are Competitive Coding (<code>cc</code>), Tech, Design, Research, and Management. The merged configuration allows 1–3 AOIs in Tech, Design, and Research. Merged rounds model forms and interviews; PR #25 adds the interview type. Task and coding-contest round types remain targets.</p>
               <ul>
                 <li>Forms support short text, long text, single choice, and multiple choice; configured rules include required, min, max, conditional required, pattern, and custom validation.</li>
                 <li>Draft saves verify ownership and editability. Final submit revalidates the full answer set and is idempotent.</li>
@@ -542,10 +543,10 @@ flowchart TB
   APPLICANT["Applicant in portal/"] --> SCHEDULER["Convex checks promoted state,<br/>interview round, and available slots"]
   SCHEDULER --> BOOK["Atomic booking<br/>one applicant, one capacity place"]
   BOOK --> PRIVATE["One OCS meeting room per booking<br/>parallel candidates stay separate"]
-  PRIVATE --> CONTEXT["Staff context in open PR #25<br/>identity · answers · comments · attendance"]
+  PRIVATE --> CONTEXT["Staff context on staging<br/>identity · answers · comments · attendance"]
   APPLICANT --> JOIN["Request interview access"]
   JOIN --> GATE["Convex verifies identity, booking owner,<br/>interview match, valid round, and join window"]
-  GATE -->|Allowed in open PR| GRANT["Two-minute signed pass<br/>booking · room · person · role"]
+  GATE -->|Allowed| GRANT["Two-minute signed pass<br/>booking · room · person · role"]
   GATE -->|Denied| ERROR["Clear reason<br/>ineligible · early · missing booking · service error"]
   GRANT --> WEB["portal/ or dash/ meeting screen<br/>reads pass from URL fragment"]
   WEB --> SFUGATE["OCS sfu/ verifies signed pass<br/>room · booking · person · role · expiry"]
@@ -556,7 +557,7 @@ flowchart TB
   ROOM --> VISIBLE["Applicant sees the visible interview panel"]
   STAFF["Authorized staff member"] --> DASH["dash/ requests observer access"]
   DASH --> SCOPE["Convex checks interviews.observe<br/>and booking-specific grant"]
-  SCOPE --> OG["Expiring observer grant<br/>open PR #25"]
+  SCOPE --> OG["Expiring observer grant<br/>merged on staging"]
   OG --> GRANT
   ROOM --> GHOST["Ghost receives room media<br/>cannot publish mic · camera · screen<br/>or send chat · reactions · hand"]
   ROOM --> FILTER["OCS SFU hides ghost names, count,<br/>and roster-change events from applicants"]
@@ -569,11 +570,28 @@ flowchart TB
   classDef target fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
   classDef external fill:#383838,stroke:#dddddd,color:#ffffff,stroke-width:2px
   class APPLICANT,HOST,STAFF current
-  class SCHEDULER,BOOK,PRIVATE,CONTEXT,JOIN,GATE,GRANT,ERROR,DASH,SCOPE,OG,GHOST,FILTER,STAFFVIEW,RENEW target
+  class SCHEDULER,BOOK,PRIVATE,CONTEXT,JOIN,GATE,GRANT,ERROR,DASH,SCOPE,OG,GHOST,FILTER,STAFFVIEW,RENEW current
   class WEB,SFUGATE,WAIT,ROOM,VISIBLE current
               </pre></div>
               <p class="callout"><strong>Ghost mode is an addition requested for OCS ’27.</strong> The spec describes meeting rooms, host controls, and interview authorization, but does not name ghost observers. Local OCS code gives Convex authority over a booking-specific grant and makes its own SFU hide the observer from the applicant roster and count while blocking outgoing media, chat, reactions, and hand controls. The applicant page tells candidates that authorized panel members may observe unseen.</p>
-              <p class="caption">This is reviewable code in open OCS-27 PR #25, not a deployed integration. Backend tests, web TypeScript checks, and both web production builds pass locally. A native-worker SFU socket test verifies waiting, admission, ghost visibility and blocked actions; a two-browser media call and network deployment have not been verified. A revoked observer loses access on the next capability renewal; an uncooperative connected client is disconnected when its current pass expires, at most two minutes later. Room state is in one SFU process until shared coordination is designed.</p>
+              <p class="caption">PR #25 is merged into staging. The meeting roles and access contract have automated coverage, but a fully working multi-user media session is not established by those checks. Camera issue <a href="https://github.com/ACM-VIT/OCS-27/issues/27">#27</a> remains open. A revoked observer loses access on the next capability renewal; an uncooperative connected client is disconnected when its current pass expires, at most two minutes later. Room state is in one SFU process until shared coordination is designed.</p>
+              <h3>Meeting page boundary — draft PR #31 for issue #30</h3>
+              <p>The draft route fix makes both <code>app/meeting/[roomId]/page.tsx</code> files Server Components. Each exports <code>instant = false</code> because the browser auth gate can omit its children while loading. This skips instant-navigation validation only on these segments; it retains partial prerendering and the existing authorization checks.</p>
+              <div class="diagram"><pre class="mermaid">
+flowchart TB
+  NAV["Open /meeting/roomId<br/>in portal or dashboard"] --> PAGE["Server Component page<br/>draft fix for issue #30"]
+  CONFIG["instant = false<br/>skip route validation only"] -. "route metadata" .-> PAGE
+  PAGE --> WAIT["Suspense loading state<br/>resolve asynchronous roomId"]
+  WAIT --> CLIENT["Existing MeetingRoom<br/>Client Component receives roomId"]
+  AUTH["Existing browser AuthGate<br/>wait for session and profile"] -. "controls client visibility" .-> CLIENT
+  CLIENT --> ACCESS["Existing Convex booking authorization<br/>and SFU signed-pass verification"]
+  ACCESS --> MEDIA["Existing meeting socket and media<br/>camera behavior is separate issue #27"]
+  classDef merged fill:#303030,stroke:#bdbdbd,color:#ffffff,stroke-width:2px
+  classDef draft fill:#555555,stroke:#dddddd,color:#ffffff,stroke-width:2px
+  class NAV,CLIENT,AUTH,ACCESS,MEDIA merged
+  class PAGE,CONFIG,WAIT draft
+              </pre></div>
+              <p class="caption">Follow-up: <a href="https://github.com/ACM-VIT/OCS-27/pull/31">draft PR #31</a> for <a href="https://github.com/ACM-VIT/OCS-27/issues/30">issue #30</a>. The full push hook passed formatting, lint, strict types, 104 backend tests, 4 SFU tests, and both production builds using synthetic public URLs. Authenticated navigation and reload behavior still await teammate testing. This route change does not claim to fix camera publishing or reception.</p>
               <h3>What last year’s portal did</h3>
               <p>The 2025–26 Explore ACM-VIT portal linked a booked scheduler slot to its in-app Meets client and minted an authenticated, expiring SFU join token. Its own mediasoup/Socket.IO SFU owned the meeting. Its admin-only Ghost Mode hid ghost participants from ordinary roster snapshots and locked their mic, camera, screen share, and hand controls; server handlers also rejected chat and reactions.</p>
               <p class="small"><a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/scheduler-client.tsx#L387">Old scheduler join flow</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/components/landing/tab.tsx#L508">Meeting opens in the old portal</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/sfu-join.ts#L12">Authenticated SFU token</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/clients/meets/components/JoinScreen.tsx#L211">Ghost toggle</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/joinRoom.ts#L56">Server-side ghost/admin check</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/config/classes/Room.ts#L65">Roster filtering</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/sfu/server/socket/handlers/chatHandlers.ts#L23">Ghost chat restriction</a> · <a href="https://github.com/ACM-VIT/explore.acmvit.in/blob/main/src/app/actions/meeting-admin-actions.ts#L319">Attendance and operator actions</a></p>
@@ -691,21 +709,21 @@ flowchart TB
           </details>
 
           <details class="architecture-card" data-search="backend functions api contracts convex applicant dashboard users current domains list applications enroll rounds forms aois scheduler tasks meetings results admin">
-            <summary>7. Backend contracts: draft code and spec targets</summary>
+            <summary>7. Backend contracts: merged code and spec targets</summary>
             <div class="architecture-body">
-              <p>Names marked “open PR #25” are implemented in the unmerged interview PR. The other names are capability examples from the specification and should not be mistaken for callable functions in merged staging.</p>
+              <p>Names marked “merged PR #25” are callable contracts in staging. Form administration is in <code>formAdmin.createForm / editForm / publishForm</code> and <code>roundAdmin.createRound / updateRound</code>; dashboard queries are in <code>dashboard</code>. Other example names below come from the specification and are not claims that those exact exports exist.</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>Caller</th><th>Function groups</th><th>What they do</th></tr></thead>
                   <tbody>
                     <tr><td>Applicant</td><td><code>users.current</code>, <code>domains.list</code>, <code>applications.mine / enroll</code>, <code>rounds.getApplicantState</code></td><td>Load own identity, eligible domains, enrollment, and current round.</td></tr>
                     <tr><td>Applicant</td><td><code>forms.getQuestions / getSubmission / saveResponse / submit</code>, <code>aois.select / leave</code></td><td>Read questions, save drafts, submit once, and update allowed AOIs.</td></tr>
-                    <tr><td>Applicant — open PR #25</td><td><code>interviews.eligible / slots / myBookings / book / cancelBooking</code></td><td>Find eligible interviews, inspect capacity, and reserve one slot atomically.</td></tr>
-                    <tr><td>Applicant — open PR #25</td><td><code>meetingAccess.join</code> action; internal <code>meetings.candidateJoinState</code> query</td><td>Recheck booking ownership and join window server-side, then issue a two-minute signed pass for that applicant’s own room. The room-state query is not callable by browsers.</td></tr>
+                    <tr><td>Applicant — merged PR #25</td><td><code>interviews.eligible / slots / myBookings / book / cancelBooking</code></td><td>Find eligible interviews, inspect capacity, and reserve one slot atomically.</td></tr>
+                    <tr><td>Applicant — merged PR #25</td><td><code>meetingAccess.join</code> action; internal <code>meetings.candidateJoinState</code> query</td><td>Recheck booking ownership and join window server-side, then issue a two-minute signed pass for that applicant’s own room. The room-state query is not callable by browsers.</td></tr>
                     <tr><td>Applicant — spec target</td><td><code>tasks.mine / submit</code>, <code>results.mine</code></td><td>View tasks and announced results after those services are implemented.</td></tr>
                     <tr><td>Reviewer / admin</td><td><code>admin.searchApplicants</code>, <code>admin.getApplicant / admin.getApplicantApplications / admin.getFormSubmission / admin.getComments / admin.getInterview / admin.getTask / admin.getRoundStats</code></td><td>Search and inspect only records allowed by the caller’s role and scope.</td></tr>
-                    <tr><td>Staff — open PR #25</td><td><code>meetings.staffInterviews / staffBookings / staffContext / myObserverBookings / verifyAttendance / grantObserver / revokeObserver</code>; internal <code>interviewerJoinState / observerState</code></td><td>Inspect scoped bookings and context, issue staff or ghost room access through the join action, verify attendance, and manage booking-specific observer grants.</td></tr>
-                    <tr><td>Staff — open PR #25</td><td><code>interviews.configure / configureSlot / staffSlots</code></td><td>Set interview title, join window, dated slots and capacity; each booking gets a distinct room under the slot’s server-side room prefix.</td></tr>
+                    <tr><td>Staff — merged PR #25</td><td><code>meetings.staffInterviews / staffBookings / staffContext / myObserverBookings / verifyAttendance / grantObserver / revokeObserver</code>; internal <code>interviewerJoinState / observerState</code></td><td>Inspect scoped bookings and context, issue staff or ghost room access through the join action, verify attendance, and manage booking-specific observer grants.</td></tr>
+                    <tr><td>Staff — merged PR #25</td><td><code>interviews.configure / configureSlot / staffSlots</code></td><td>Set interview title, join window, dated slots and capacity; each booking gets a distinct room under the slot’s server-side room prefix.</td></tr>
                     <tr><td>Reviewer / admin — spec target</td><td><code>admin.addComment / promote / reject / assignTask / updateTask</code></td><td>Perform guarded review, progression, and task actions.</td></tr>
                     <tr><td>Interviewer / reviewer</td><td><code>admin.openCodingWorkspace</code>, <code>admin.queryInterviewContext</code></td><td>Open an authorized Judge0 workspace and retrieve cited transcript assistance.</td></tr>
                     <tr><td>Proposed RBAC addition</td><td><code>admin.grantRole / revokeRole / grantInterviewObserver</code></td><td>Manage explicit role/capability grants with scope and audit. These names are suggested; the spec does not prescribe role-management function names.</td></tr>
@@ -719,7 +737,7 @@ flowchart TB
           <details class="architecture-card" data-search="database schema data model users rounds roundUsers aois questions validation forms interviews slots bookings tasks comments notifications coding transcripts transcriptSegments">
             <summary>8. Data groups and what each one owns</summary>
             <div class="architecture-body">
-              <p>Merged and draft Convex schemas keep selection and interview records in OCS; the first-party <code>sfu/</code> package handles live media and Judge0 would handle execution. Tasks, coding and transcript storage shown below are targets until their tables and handlers are merged.</p>
+              <p>Merged Convex schemas keep selection and interview records in OCS; the first-party <code>sfu/</code> package handles live media and Judge0 would handle execution. Tasks, coding and transcript storage shown below are targets until their tables and handlers are merged.</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>Data group</th><th>Actual table or target</th><th>Key rule</th></tr></thead>
@@ -727,7 +745,7 @@ flowchart TB
                     <tr><td>Identity and access — merged</td><td><code>profiles</code>, <code>settings</code>, <code>roles</code>, <code>roleAssignments</code></td><td>Stable auth ID; verified eligible email; stored scoped grants.</td></tr>
                     <tr><td>Selection — merged</td><td><code>domains</code>, <code>applications</code>, <code>rounds</code>, <code>roundApplications</code>, AOIs</td><td>Stable domain keys; configured AOI limits are 1–3 where applicable.</td></tr>
                     <tr><td>Forms and review — merged</td><td><code>forms</code>, <code>draftAnswers</code>, <code>formSubmissions</code>, <code>reviewSnapshots</code>, <code>comments</code></td><td>Submissions and review evidence preserve history; current edit policy can permit resubmission.</td></tr>
-                    <tr><td>Scheduling — open PR #25</td><td><code>interviews</code>, <code>interviewSlots</code>, <code>interviewBookings</code>, <code>interviewObserverGrants</code></td><td>Capacity is reserved atomically; a distinct OCS meeting room is derived for each booking and is revealed only to its authorized participant or staff caller.</td></tr>
+                    <tr><td>Scheduling — merged PR #25</td><td><code>interviews</code>, <code>interviewSlots</code>, <code>interviewBookings</code>, <code>interviewObserverGrants</code></td><td>Capacity is reserved atomically; a distinct OCS meeting room is derived for each booking and is revealed only to its authorized participant or staff caller.</td></tr>
                     <tr><td>Tasks and review</td><td><code>tasks</code>, <code>taskSubmissions</code>, <code>comments</code>, <code>notifications</code></td><td>Tasks enforce deadline and ownership; comments are internal; notices are recipient-scoped.</td></tr>
                     <tr><td>Coding</td><td><code>codingContests</code>, <code>codingSubmissions</code>, Judge0 correlation IDs</td><td>Every execution is scoped to contest or interview; secrets and hidden tests stay server-side.</td></tr>
                     <tr><td>Interview intelligence</td><td><code>transcripts</code>, <code>transcriptSegments</code>, indexes and citations</td><td>Meeting, interview, applicant, and round linkage; retention and reviewer access enforced.</td></tr>
@@ -746,14 +764,14 @@ flowchart TB
           <table>
             <thead><tr><th>Capability in spec</th><th>Current evidence in the repository</th></tr></thead>
             <tbody>
-              <tr><td>Google sign-in for eligible VIT users; backend role checks</td><td>Merged staging has role schemas and policy helpers. Google/Better Auth is in open PR #23; it is not merged into staging.</td></tr>
-              <tr><td>Five domains, configurable rounds, AOIs, forms, drafts, submissions, results, and progression</td><td>Merged staging has the foundation, form, review and comment schemas plus pure policy helpers. Applicant, form-admin and decision handlers are in separate open PRs #19, #22 and #18; the web pages are placeholders.</td></tr>
-              <tr><td>Scheduler with eligibility checks and atomic slot booking</td><td>Open PR <a href="https://github.com/ACM-VIT/OCS-27/pull/25">#25</a> adds interview slots, eligibility queries and an atomic booking mutation. Candidate and staff scheduling pages are included in this PR. The PR is not merged or deployed.</td></tr>
-              <tr><td>First-party OCS meeting authorization, waiting room, interview context, and ghost observers</td><td>Open PR #25 adds a two-minute booking-bound pass, candidate and staff meeting pages, context, attendance, and observer grants. New <code>sfu/</code> code verifies access, handles mediasoup rooms, and hides receive-only ghosts. It has not been merged or passed a live media test.</td></tr>
+              <tr><td>Google sign-in for eligible VIT users; backend role checks</td><td>Google/Better Auth and candidate profiles merged in PR #23. Role schemas and policy helpers are merged; RBAC administration APIs remain in PR #26.</td></tr>
+              <tr><td>Five domains, configurable rounds, AOIs, forms, drafts, submissions, results, and progression</td><td>Foundation schemas and form/round administration are merged (#22). Applicant and decision handlers remain in separate PRs #19 and #18. Interview screens are implemented; general applicant/staff form screens are separate work.</td></tr>
+              <tr><td>Scheduler with eligibility checks and atomic slot booking</td><td><a href="https://github.com/ACM-VIT/OCS-27/pull/25">Merged PR #25</a> includes interview slots, eligibility queries, atomic booking, and candidate/staff scheduling pages. Live access and media still require a configured environment and teammate verification.</td></tr>
+              <tr><td>First-party OCS meeting authorization, waiting room, interview context, and ghost observers</td><td>PR #25 is merged with booking-bound access, meeting pages and its own SFU. Camera issue #27 is open. The route-validation change for issue #30 remains a draft; neither a successful build nor an audio-only call proves camera behavior.</td></tr>
               <tr><td>Judge0 contest for Competitive Coding and interviewer coding portal</td><td>No Judge0 integration, coding UI, submission record, or verdict handling is tracked.</td></tr>
               <tr><td>Task assignment, deadlines, applicant submissions, and reviews</td><td>No task schema or task workflow is tracked.</td></tr>
               <tr><td>Transcript ingestion, scoped AI queries, citations, privacy, and retention</td><td>No transcript, AI, indexing, or retention implementation is tracked.</td></tr>
-              <tr><td>Operator search, applicant review, comments, attendance, decisions, and audit trail</td><td>Merged staging has review/comment/access schemas and policy helpers; dashboard queries and decision handlers are in open PRs #21 and #18. Open PR #25 adds attendance functions and an interview dashboard page; the rest of <code>dash/</code> remains a placeholder.</td></tr>
+              <tr><td>Operator search, applicant review, comments, attendance, decisions, and audit trail</td><td>Scoped dashboard queries merged in PR #21; interview context and attendance merged in PR #25. Review/decision handlers remain in PR #18, and the broader staff UI remains separate work.</td></tr>
               <tr><td>Convex data model, authorization contracts, concurrency guarantees, CI, and deployment</td><td>Merged staging has schema, tests, quality scripts and <code>infra/aws/staging/</code>. No production deployment or live interview integration was verified by this guide.</td></tr>
             </tbody>
           </table>
@@ -770,11 +788,11 @@ flowchart TB
       <section id="evidence">
         <h2>Evidence and review scope</h2>
         <ul>
-          <li>Repository: <a href="https://github.com/ACM-VIT/OCS-27/tree/7bc209e">merged <code>staging</code> at <code>7bc209e</code></a>; <a href="https://github.com/ACM-VIT/OCS-27/tree/6f1e4ce"><code>main</code> at <code>6f1e4ce</code></a>; <a href="https://github.com/ACM-VIT/OCS-27/pull/25">open interview PR #25</a> at <code>c26ff54</code>. The fork’s <code>main</code> and <code>staging</code> were fast-forwarded to their upstream counterparts.</li>
+          <li>Repository snapshot: <a href="https://github.com/ACM-VIT/OCS-27/tree/d24b92d">staging at <code>d24b92d</code></a>; <a href="https://github.com/ACM-VIT/OCS-27/tree/6f1e4ce">main at <code>6f1e4ce</code></a>. Auth PR #23 merged before interview PR #25. The issue #30 route change and a prerequisite lockfile merge repair are in <a href="https://github.com/ACM-VIT/OCS-27/pull/31">draft PR #31</a>, separate from the merged snapshot.</li>
           <li>Checked the tracked workspace tree, backend schemas, interview functions and tests, package manifests, both app root pages, staging infrastructure files, and open PR status. Open PR code is identified separately from merged code.</li>
           <li>Read the complete OCS ’27 specification, sections 00–20. Its proposed directory tree and its Node/pnpm/Vite/command descriptions conflict with the checked-in repository; the product workflows are shown as targets.</li>
           <li>Specification source: <a href="https://ocs27-spec.n00bda.chatgpt.site/">ACM OCS ’27 technical specification</a> (reader access is protected; its password is not stored in this page).</li>
-          <li>Review date: 28 October 2026. The 2025–26 Explore ACM-VIT source was checked for scheduler-to-meeting authorization and Ghost Mode behavior. The separate Conclave repository was consulted as a reference only.</li>
+          <li>Review date: 29 October 2026. The 2025–26 Explore ACM-VIT source was checked for scheduler-to-meeting authorization and Ghost Mode behavior. The separate Conclave repository was consulted as a reference only.</li>
         </ul>
         <p class="small">The shared development service was supplied by the team and has not been queried or modified during this review. No Convex CLI command, Docker command, or production deployment was run.</p>
       </section>
